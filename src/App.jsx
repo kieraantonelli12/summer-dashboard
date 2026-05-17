@@ -1,14 +1,11 @@
-import React, { useState } from 'react';
-import { ArrowLeft, Check, Plus, Sparkles, GraduationCap, Box, Palette, BookOpen, Briefcase, DollarSign, Music, ExternalLink } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ArrowLeft, Check, Plus, Sparkles, GraduationCap, Box, Palette, BookOpen, Briefcase, DollarSign, Music, ExternalLink, Calendar as CalendarIcon, X } from 'lucide-react';
 
 // ─── EDIT THESE TO MATCH YOUR LIFE ─────────────────────────────────────
 const GRADUATION_DATE = '2026-06-13';
 const SUMMER_END_DATE = '2026-08-31';
 // ───────────────────────────────────────────────────────────────────────
 
-// ─── YOUR APPS — uses Google's favicon service which pulls the REAL
-// favicon used by each site (the same icon you see in browser tabs).
-// To swap an app, change "domain" to the actual domain of the site.
 const APPS = [
   { name: 'Canvas',    url: 'https://canvas.instructure.com',   domain: 'instructure.com',     color: '#E72429' },
   { name: 'Outlook',   url: 'https://outlook.office.com/mail',  domain: 'outlook.office.com',  color: '#0078D4' },
@@ -22,7 +19,6 @@ const APPS = [
   { name: 'Instagram', url: 'https://instagram.com',            domain: 'instagram.com',       color: '#E4405F' },
   { name: 'Pinterest', url: 'https://pinterest.com',            domain: 'pinterest.com',       color: '#E60023' },
 ];
-// ───────────────────────────────────────────────────────────────────────
 
 const GREETINGS = [
   'hey, you got this.',
@@ -33,6 +29,24 @@ const GREETINGS = [
   'one beautiful summer.',
 ];
 
+// Themed Unsplash collections — Unsplash Source rotates these daily.
+// The {dateSeed} is replaced with today's date so the image stays the same all day
+// but changes each morning. Keep tags soft-film aesthetic.
+const IMAGE_THEMES = {
+  graduation:  'graduation,celebration,confetti,gold',
+  moveout:     'moving,boxes,packing,sunlight',
+  room:        'bedroom,plants,interior,cozy',
+  classes:     'books,coffee,study,desk',
+  career:      'workspace,laptop,desk,plants',
+  income:      'cafe,working,laptop,minimal',
+  activities:  'concert,summer,friends,golden',
+  flowers:     'wildflowers,bouquet,pastel',
+  coffee:      'latte,coffee,cafe,cozy',
+  sunlight:    'sunlight,window,plants,morning',
+  beach:       'beach,ocean,summer,pastel',
+  film:        'film,photography,vintage,warm',
+};
+
 const STYLES = `
   .font-display { font-family: 'Bricolage Grotesque', system-ui, sans-serif; letter-spacing: -0.025em; }
   .font-editorial { font-family: 'Instrument Serif', Georgia, serif; letter-spacing: -0.01em; }
@@ -42,48 +56,51 @@ const STYLES = `
     from { opacity: 0; transform: translateY(16px); }
     to { opacity: 1; transform: translateY(0); }
   }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
   .fade-up { animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .fade-in { animation: fadeIn 0.2s ease both; }
+  .scale-in { animation: scaleIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) both; }
 
-  .bucket-card {
+  .grid-tile {
     transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
     will-change: transform;
   }
-  .bucket-card:hover { transform: translateY(-4px); }
-  .bucket-card:active { transform: translateY(-1px); }
-  .film { filter: saturate(0.92) contrast(1.02); }
+  .grid-tile:hover { transform: translateY(-3px); }
+  .grid-tile:active { transform: translateY(-1px); }
+  .film { filter: saturate(0.94) contrast(1.02); }
   .pill-btn { transition: all 0.2s ease; }
   .pill-btn:hover { transform: scale(1.02); }
 
-  .app-tile {
-    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
-  }
-  .app-tile:hover {
-    transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 8px 20px -8px rgba(0,0,0,0.18);
-  }
+  .app-tile { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+  .app-tile:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 20px -8px rgba(0,0,0,0.18); }
   .app-tile:active { transform: translateY(-1px) scale(1.02); }
+
+  .cal-btn { transition: all 0.18s ease; opacity: 0.55; }
+  .cal-btn:hover { opacity: 1; transform: scale(1.1); }
 
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 99px; }
 
   @media (max-width: 720px) {
-    .bento-grid { grid-template-columns: 1fr !important; }
-    .bento-grid > div { grid-column: span 1 !important; }
-    .hero-headline { font-size: 48px !important; }
+    .bento-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+      grid-auto-rows: 120px !important;
+    }
+    .bento-grid > * { grid-column: span 2 !important; grid-row: span 1 !important; }
+    .bento-grid > .span-2-mobile { grid-column: span 2 !important; }
+    .hero-headline { font-size: 44px !important; }
     .kanban-grid { grid-template-columns: 1fr !important; }
   }
 `;
 
 const INITIAL_BUCKETS = [
   {
-    id: 'graduation',
-    title: 'Graduation',
-    icon: GraduationCap,
-    photo: 'https://images.unsplash.com/photo-1497633762265-9d179a990aa6?w=1200&q=80&auto=format',
-    tint: 'rgba(244, 114, 182, 0.78)',
-    fallback: 'linear-gradient(135deg, #FB7185, #F472B6)',
-    accent: '#BE185D',
-    ink: '#500724',
+    id: 'graduation', title: 'Graduation', icon: GraduationCap,
+    color: '#F472B6', deep: '#BE185D', soft: '#FCE7F3',
     note: '1 class needs love',
     tasks: [
       { id: 1, text: 'Meet financial planning prof for extra credit', done: false, col: 'doing' },
@@ -95,14 +112,8 @@ const INITIAL_BUCKETS = [
     ],
   },
   {
-    id: 'moveout',
-    title: 'Move-out',
-    icon: Box,
-    photo: 'https://images.unsplash.com/photo-1530563885674-66db50a1af19?w=1200&q=80&auto=format',
-    tint: 'rgba(52, 211, 153, 0.78)',
-    fallback: 'linear-gradient(135deg, #34D399, #6EE7B7)',
-    accent: '#047857',
-    ink: '#022C22',
+    id: 'moveout', title: 'Move-out', icon: Box,
+    color: '#34D399', deep: '#047857', soft: '#D1FAE5',
     note: 'EBT pending',
     tasks: [
       { id: 1, text: 'Cancel EBT benefits', done: false, col: 'todo' },
@@ -115,14 +126,8 @@ const INITIAL_BUCKETS = [
     ],
   },
   {
-    id: 'room',
-    title: 'New room',
-    icon: Palette,
-    photo: 'https://images.unsplash.com/photo-1513694203232-719a280e022f?w=1200&q=80&auto=format',
-    tint: 'rgba(167, 139, 250, 0.78)',
-    fallback: 'linear-gradient(135deg, #A78BFA, #C4B5FD)',
-    accent: '#6D28D9',
-    ink: '#2E1065',
+    id: 'room', title: 'New room', icon: Palette,
+    color: '#A78BFA', deep: '#6D28D9', soft: '#EDE9FE',
     note: '4 pins saved',
     tasks: [
       { id: 1, text: 'Build Pinterest mood board', done: true, col: 'done' },
@@ -134,14 +139,8 @@ const INITIAL_BUCKETS = [
     ],
   },
   {
-    id: 'summer-classes',
-    title: 'Summer classes',
-    icon: BookOpen,
-    photo: 'https://images.unsplash.com/photo-1474932430478-367dbb6832c1?w=1200&q=80&auto=format',
-    tint: 'rgba(251, 191, 36, 0.78)',
-    fallback: 'linear-gradient(135deg, #FBBF24, #FCD34D)',
-    accent: '#B45309',
-    ink: '#451A03',
+    id: 'summer-classes', title: 'Summer classes', icon: BookOpen,
+    color: '#FBBF24', deep: '#B45309', soft: '#FEF3C7',
     note: 'Starts June 24',
     tasks: [
       { id: 1, text: 'Confirm registration and credits', done: false, col: 'todo' },
@@ -151,14 +150,8 @@ const INITIAL_BUCKETS = [
     ],
   },
   {
-    id: 'career',
-    title: 'Career launch',
-    icon: Briefcase,
-    photo: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=1200&q=80&auto=format',
-    tint: 'rgba(96, 165, 250, 0.78)',
-    fallback: 'linear-gradient(135deg, #60A5FA, #93C5FD)',
-    accent: '#1D4ED8',
-    ink: '#172554',
+    id: 'career', title: 'Career launch', icon: Briefcase,
+    color: '#60A5FA', deep: '#1D4ED8', soft: '#DBEAFE',
     note: 'AI cert + portfolio',
     tasks: [
       { id: 1, text: 'Refresh LinkedIn photo and headline', done: false, col: 'todo' },
@@ -170,14 +163,8 @@ const INITIAL_BUCKETS = [
     ],
   },
   {
-    id: 'income',
-    title: 'Summer income',
-    icon: DollarSign,
-    photo: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=1200&q=80&auto=format',
-    tint: 'rgba(74, 222, 128, 0.78)',
-    fallback: 'linear-gradient(135deg, #4ADE80, #86EFAC)',
-    accent: '#166534',
-    ink: '#052E16',
+    id: 'income', title: 'Summer income', icon: DollarSign,
+    color: '#4ADE80', deep: '#166534', soft: '#DCFCE7',
     note: '$0 of $3k goal',
     tasks: [
       { id: 1, text: 'Set up Upwork or Contra profile', done: false, col: 'todo' },
@@ -188,14 +175,8 @@ const INITIAL_BUCKETS = [
     ],
   },
   {
-    id: 'activities',
-    title: 'Summer fun',
-    icon: Music,
-    photo: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=1200&q=80&auto=format',
-    tint: 'rgba(251, 146, 60, 0.78)',
-    fallback: 'linear-gradient(135deg, #FB923C, #FDBA74)',
-    accent: '#C2410C',
-    ink: '#431407',
+    id: 'activities', title: 'Summer fun', icon: Music,
+    color: '#FB923C', deep: '#C2410C', soft: '#FED7AA',
     note: '3 concerts saved',
     tasks: [
       { id: 1, text: 'Concert tickets locked in', done: false, col: 'todo' },
@@ -208,7 +189,15 @@ const INITIAL_BUCKETS = [
   },
 ];
 
-const HERO_PHOTO = 'https://images.unsplash.com/photo-1518173946687-a4c8892bbd9f?w=1600&q=85&auto=format';
+// Bing daily image — uses free public proxy that allows browser CORS.
+const BING_DAILY_URL = 'https://bing.biturl.top/?resolution=1920&format=image&index=0&mkt=en-US';
+
+// Themed Unsplash image — featured/{theme} returns curated photos from Unsplash.
+// Add a daily seed so it changes every day but stays stable within a day.
+function unsplashURL(theme, w = 800, h = 800) {
+  const today = new Date().toISOString().slice(0, 10);
+  return `https://source.unsplash.com/featured/${w}x${h}/?${IMAGE_THEMES[theme] || theme}&sig=${today}`;
+}
 
 function daysUntil(dateString) {
   const target = new Date(dateString);
@@ -221,184 +210,152 @@ function progressOf(bucket) {
   return Math.round((done / bucket.tasks.length) * 100);
 }
 
-function AppTile({ app, delay }) {
-  const handleImgError = (e) => {
-    e.target.style.display = 'none';
-    const fallback = e.target.parentElement.querySelector('.fallback-letter');
-    if (fallback) fallback.style.display = 'block';
+function buildGoogleCalUrl({ title, date, time, durationMin = 60, details = '' }) {
+  const fmt = (d) => d.toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '').slice(0, 15);
+  let dates;
+  if (time) {
+    const start = new Date(`${date}T${time}:00`);
+    const end = new Date(start.getTime() + durationMin * 60 * 1000);
+    dates = `${fmt(start)}/${fmt(end)}`;
+  } else {
+    const start = date.replace(/-/g, '');
+    const endDate = new Date(`${date}T00:00:00`);
+    endDate.setDate(endDate.getDate() + 1);
+    const end = endDate.toISOString().slice(0, 10).replace(/-/g, '');
+    dates = `${start}/${end}`;
+  }
+  const params = new URLSearchParams({ action: 'TEMPLATE', text: title, dates, details });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
+function AddToCalendarPopup({ taskText, onClose, accentColor }) {
+  const today = new Date().toISOString().slice(0, 10);
+  const [date, setDate] = useState(today);
+  const [time, setTime] = useState('');
+  const [allDay, setAllDay] = useState(true);
+
+  const handleAdd = () => {
+    const url = buildGoogleCalUrl({
+      title: taskText, date, time: allDay ? '' : time,
+      details: 'Added from your Summer 2026 dashboard',
+    });
+    window.open(url, '_blank', 'noopener,noreferrer');
+    onClose();
   };
 
   return (
-    <a
-      href={app.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="app-tile fade-up"
-      style={{
-        background: '#FFFFFF',
-        width: '100%',
-        aspectRatio: '1',
-        borderRadius: '20px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: '#1F2937',
-        textDecoration: 'none',
-        border: '1px solid #F3F4F6',
-        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
-        animationDelay: `${delay}s`,
-        cursor: 'pointer',
-        position: 'relative',
-        overflow: 'hidden',
-        padding: '8px',
-      }}
-      title={`Open ${app.name}`}
-    >
-      <img
-        src={`https://www.google.com/s2/favicons?domain=${app.domain}&sz=64`}
-        alt=""
-        width="32"
-        height="32"
-        loading="lazy"
-        onError={handleImgError}
-        style={{ borderRadius: '6px' }}
-      />
-      <span
-        className="fallback-letter font-display"
-        style={{
-          display: 'none',
-          fontSize: '24px',
-          fontWeight: 800,
-          color: app.color,
-          lineHeight: 1,
-        }}
-      >
-        {app.name[0]}
-      </span>
-      <div style={{
-        fontSize: '10px',
-        fontWeight: 600,
-        opacity: 0.85,
-        marginTop: '6px',
-        letterSpacing: '0.02em',
-        lineHeight: 1,
-        textAlign: 'center',
-        color: '#374151',
+    <div onClick={onClose} className="fade-in" style={{
+      position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.45)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px',
+    }}>
+      <div onClick={(e) => e.stopPropagation()} className="scale-in" style={{
+        background: '#fff', borderRadius: '24px', padding: '28px',
+        width: '100%', maxWidth: '420px', boxShadow: '0 20px 50px -10px rgba(0,0,0,0.3)',
       }}>
-        {app.name}
-      </div>
-    </a>
-  );
-}
-
-function AppLauncherCard({ apps }) {
-  return (
-    <div
-      className="fade-up"
-      style={{
-        background: '#FFFFFF',
-        borderRadius: '28px',
-        padding: '24px',
-        minHeight: '200px',
-        height: '100%',
-        animationDelay: '0.5s',
-        boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-        <div>
-          <div className="font-display" style={{ fontSize: '30px', fontWeight: 700, color: '#1F2937', lineHeight: 1 }}>
-            Quick launch
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+          <div>
+            <div className="font-display" style={{ fontSize: '24px', fontWeight: 700, color: '#1F2937', lineHeight: 1.1 }}>
+              Schedule it
+            </div>
+            <div className="font-editorial" style={{ fontSize: '14px', color: '#9CA3AF', fontStyle: 'italic', marginTop: '4px' }}>
+              add this to Google Calendar
+            </div>
           </div>
-          <div className="font-editorial" style={{ fontSize: '14px', color: '#9CA3AF', fontStyle: 'italic', marginTop: '4px' }}>
-            all your apps, one tap
-          </div>
+          <button onClick={onClose} style={{
+            background: '#F3F4F6', border: 'none', width: '34px', height: '34px',
+            borderRadius: '12px', cursor: 'pointer', display: 'flex',
+            alignItems: 'center', justifyContent: 'center', color: '#6B7280',
+          }}>
+            <X size={18} />
+          </button>
         </div>
         <div style={{
-          background: '#F3F4F6',
-          color: '#6B7280',
-          width: '38px',
-          height: '38px',
-          borderRadius: '14px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          background: '#FAF6EF', padding: '14px 16px', borderRadius: '14px',
+          fontSize: '14px', color: '#1F2937', marginBottom: '20px', lineHeight: 1.4,
         }}>
-          <ExternalLink size={18} strokeWidth={2.2} />
+          <div style={{ fontSize: '11px', color: '#9CA3AF', fontWeight: 600, marginBottom: '4px', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Task</div>
+          {taskText}
         </div>
-      </div>
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fill, minmax(74px, 1fr))',
-        gap: '10px',
-        flex: 1,
-      }}>
-        {apps.map((app, i) => (
-          <AppTile key={app.name} app={app} delay={0.55 + i * 0.03} />
-        ))}
+        <div style={{ marginBottom: '14px' }}>
+          <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#374151', marginBottom: '6px', letterSpacing: '0.02em', textTransform: 'uppercase' }}>
+            Date
+          </label>
+          <input type="date" value={date} onChange={(e) => setDate(e.target.value)} style={{
+            width: '100%', padding: '12px 14px', border: '1px solid #E5E7EB',
+            borderRadius: '12px', fontSize: '15px', fontFamily: 'inherit', outline: 'none', color: '#1F2937',
+          }}/>
+        </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '14px' }}>
+          <input type="checkbox" id="allday" checked={allDay} onChange={(e) => setAllDay(e.target.checked)}
+            style={{ width: '18px', height: '18px', accentColor: accentColor, cursor: 'pointer' }}/>
+          <label htmlFor="allday" style={{ fontSize: '14px', color: '#374151', cursor: 'pointer', fontWeight: 500 }}>
+            All-day event
+          </label>
+        </div>
+        {!allDay && (
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#374151', marginBottom: '6px', letterSpacing: '0.02em', textTransform: 'uppercase' }}>
+              Time
+            </label>
+            <input type="time" value={time} onChange={(e) => setTime(e.target.value)} style={{
+              width: '100%', padding: '12px 14px', border: '1px solid #E5E7EB',
+              borderRadius: '12px', fontSize: '15px', fontFamily: 'inherit', outline: 'none', color: '#1F2937',
+            }}/>
+            <div style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '4px' }}>
+              Defaults to a 1-hour block
+            </div>
+          </div>
+        )}
+        <button onClick={handleAdd} disabled={!allDay && !time} className="pill-btn" style={{
+          background: accentColor, color: '#fff', border: 'none', width: '100%',
+          padding: '14px', borderRadius: '14px', fontSize: '15px', fontWeight: 700,
+          cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center',
+          gap: '8px', fontFamily: 'inherit', opacity: (!allDay && !time) ? 0.5 : 1,
+        }}>
+          <CalendarIcon size={17} />
+          Open in Google Calendar
+        </button>
+        <div className="font-editorial" style={{ fontSize: '12px', color: '#9CA3AF', textAlign: 'center', marginTop: '12px', fontStyle: 'italic' }}>
+          opens in a new tab, just hit save there
+        </div>
       </div>
     </div>
   );
 }
 
-function BucketCard({ bucket, onOpen, delay }) {
+// Solid-color bucket block (no background photo)
+function BucketBlock({ bucket, onOpen, delay, gridCol, gridRow }) {
   const Icon = bucket.icon;
   const pct = progressOf(bucket);
-  const bgLayered = `linear-gradient(135deg, ${bucket.tint}, ${bucket.tint}), url('${bucket.photo}'), ${bucket.fallback}`;
 
   return (
-    <button
-      onClick={onOpen}
-      className="bucket-card fade-up film"
-      style={{
-        background: bgLayered,
-        backgroundSize: 'cover, cover, cover',
-        backgroundPosition: 'center',
-        color: '#fff',
-        border: 'none',
-        borderRadius: '28px',
-        padding: '24px',
-        textAlign: 'left',
-        cursor: 'pointer',
-        minHeight: '200px',
-        width: '100%',
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'space-between',
-        fontFamily: 'inherit',
-        animationDelay: `${delay}s`,
-        boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
-      }}
-    >
+    <button onClick={onOpen} className="grid-tile fade-up" style={{
+      gridColumn: gridCol, gridRow: gridRow,
+      background: bucket.color, color: '#fff', border: 'none',
+      borderRadius: '24px', padding: '20px', textAlign: 'left',
+      cursor: 'pointer', display: 'flex', flexDirection: 'column',
+      justifyContent: 'space-between', fontFamily: 'inherit',
+      animationDelay: `${delay}s`, boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+      overflow: 'hidden',
+    }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div style={{
-          background: 'rgba(255,255,255,0.25)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
-          color: '#fff',
-          width: '42px',
-          height: '42px',
-          borderRadius: '14px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
+          background: 'rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+          color: '#fff', width: '38px', height: '38px', borderRadius: '12px',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-          <Icon size={20} strokeWidth={2.2} />
+          <Icon size={18} strokeWidth={2.2} />
         </div>
-        <div className="font-display" style={{ fontSize: '38px', fontWeight: 800, lineHeight: 1, textShadow: '0 1px 8px rgba(0,0,0,0.15)' }}>
+        <div className="font-display" style={{ fontSize: '28px', fontWeight: 800, lineHeight: 1 }}>
           {pct}%
         </div>
       </div>
       <div>
-        <div className="font-display" style={{ fontSize: '34px', fontWeight: 700, lineHeight: 1, marginBottom: '6px', textShadow: '0 1px 12px rgba(0,0,0,0.2)' }}>
+        <div className="font-display" style={{ fontSize: '26px', fontWeight: 700, lineHeight: 1, marginBottom: '4px' }}>
           {bucket.title}
         </div>
-        <div style={{ fontSize: '13px', opacity: 0.92, fontWeight: 500, marginBottom: '14px' }}>{bucket.note}</div>
-        <div style={{ height: '6px', background: 'rgba(255,255,255,0.3)', borderRadius: '99px', overflow: 'hidden' }}>
+        <div style={{ fontSize: '12px', opacity: 0.9, fontWeight: 500, marginBottom: '10px' }}>{bucket.note}</div>
+        <div style={{ height: '5px', background: 'rgba(255,255,255,0.3)', borderRadius: '99px', overflow: 'hidden' }}>
           <div style={{ width: `${pct}%`, height: '100%', background: '#fff', transition: 'width 0.4s ease' }} />
         </div>
       </div>
@@ -406,87 +363,182 @@ function BucketCard({ bucket, onOpen, delay }) {
   );
 }
 
-function Stat({ label, value }) {
+// Scenic image panel — just a beautiful photo in the grid
+function ImagePanel({ theme, delay, gridCol, gridRow, caption }) {
   return (
-    <div>
-      <div style={{ fontSize: '11px', opacity: 0.7, textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 600 }}>{label}</div>
-      <div className="font-display" style={{ fontSize: '36px', fontWeight: 700, lineHeight: 1.1, marginTop: '4px' }}>{value}</div>
+    <div className="grid-tile fade-up film" style={{
+      gridColumn: gridCol, gridRow: gridRow,
+      background: `linear-gradient(135deg, rgba(0,0,0,0.05), rgba(0,0,0,0.15)), url('${unsplashURL(theme, 800, 800)}'), #E5E7EB`,
+      backgroundSize: 'cover', backgroundPosition: 'center',
+      borderRadius: '24px', animationDelay: `${delay}s`,
+      boxShadow: '0 1px 2px rgba(0,0,0,0.04)', position: 'relative',
+      overflow: 'hidden',
+    }}>
+      {caption && (
+        <div className="font-editorial" style={{
+          position: 'absolute', bottom: '14px', left: '16px', right: '16px',
+          color: '#fff', fontSize: '14px', fontStyle: 'italic',
+          textShadow: '0 1px 8px rgba(0,0,0,0.4)', opacity: 0.95,
+        }}>
+          {caption}
+        </div>
+      )}
     </div>
   );
 }
 
-function Home({ buckets, onOpen }) {
+function AppTile({ app, delay }) {
+  const handleImgError = (e) => {
+    e.target.style.display = 'none';
+    const fallback = e.target.parentElement.querySelector('.fallback-letter');
+    if (fallback) fallback.style.display = 'block';
+  };
+  return (
+    <a href={app.url} target="_blank" rel="noopener noreferrer" className="app-tile fade-up"
+      style={{
+        background: '#FFFFFF', width: '100%', aspectRatio: '1', borderRadius: '18px',
+        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+        color: '#1F2937', textDecoration: 'none', border: '1px solid #F3F4F6',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.04)', animationDelay: `${delay}s`,
+        cursor: 'pointer', position: 'relative', overflow: 'hidden', padding: '6px',
+      }}
+      title={`Open ${app.name}`}>
+      <img src={`https://www.google.com/s2/favicons?domain=${app.domain}&sz=64`}
+        alt="" width="28" height="28" loading="lazy" onError={handleImgError}
+        style={{ borderRadius: '6px' }} />
+      <span className="fallback-letter font-display" style={{
+        display: 'none', fontSize: '22px', fontWeight: 800, color: app.color, lineHeight: 1,
+      }}>{app.name[0]}</span>
+      <div style={{
+        fontSize: '9px', fontWeight: 600, opacity: 0.85, marginTop: '5px',
+        letterSpacing: '0.02em', lineHeight: 1, textAlign: 'center', color: '#374151',
+      }}>{app.name}</div>
+    </a>
+  );
+}
+
+function AppLauncherRow({ apps, gridCol, gridRow, delay }) {
+  return (
+    <div className="fade-up" style={{
+      gridColumn: gridCol, gridRow: gridRow,
+      background: '#FFFFFF', borderRadius: '24px', padding: '18px 20px',
+      animationDelay: `${delay}s`, boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+      display: 'flex', alignItems: 'center', gap: '16px',
+    }}>
+      <div style={{ flexShrink: 0 }}>
+        <div className="font-display" style={{ fontSize: '20px', fontWeight: 700, color: '#1F2937', lineHeight: 1 }}>
+          Quick launch
+        </div>
+        <div className="font-editorial" style={{ fontSize: '12px', color: '#9CA3AF', fontStyle: 'italic', marginTop: '2px' }}>
+          all your apps
+        </div>
+      </div>
+      <div style={{
+        flex: 1, display: 'grid',
+        gridTemplateColumns: `repeat(${apps.length}, 1fr)`,
+        gap: '8px',
+      }}>
+        {apps.map((app, i) => (<AppTile key={app.name} app={app} delay={delay + 0.05 + i * 0.03} />))}
+      </div>
+    </div>
+  );
+}
+
+function Stat({ label, value }) {
+  return (
+    <div>
+      <div style={{ fontSize: '11px', opacity: 0.7, textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 600 }}>{label}</div>
+      <div className="font-display" style={{ fontSize: '32px', fontWeight: 700, lineHeight: 1.1, marginTop: '4px' }}>{value}</div>
+    </div>
+  );
+}
+
+function Hero({ buckets }) {
   const [greeting] = useState(() => GREETINGS[Math.floor(Math.random() * GREETINGS.length)]);
+  const [bingLoaded, setBingLoaded] = useState(false);
   const totalDone = buckets.reduce((s, b) => s + b.tasks.filter(t => t.done).length, 0);
   const totalTasks = buckets.reduce((s, b) => s + b.tasks.length, 0);
   const gradDays = daysUntil(GRADUATION_DATE);
   const summerDays = daysUntil(SUMMER_END_DATE);
 
+  // Preload Bing daily so we know if it works
+  useEffect(() => {
+    const img = new Image();
+    img.onload = () => setBingLoaded(true);
+    img.onerror = () => setBingLoaded(false);
+    img.src = BING_DAILY_URL;
+  }, []);
+
+  const bgImage = bingLoaded
+    ? `linear-gradient(135deg, rgba(76, 29, 149, 0.55), rgba(190, 24, 93, 0.45)), url('${BING_DAILY_URL}')`
+    : `linear-gradient(135deg, #4C1D95, #C026D3)`;
+
+  return (
+    <div className="fade-up film" style={{
+      background: bgImage, backgroundSize: 'cover', backgroundPosition: 'center',
+      borderRadius: '28px', padding: '40px 32px', color: '#FFF7ED', marginBottom: '14px',
+      position: 'relative', overflow: 'hidden', minHeight: '260px',
+      display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+    }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', opacity: 0.85, fontWeight: 500 }}>
+        <Sparkles size={15} />
+        <span>Summer 2026 · today's view from somewhere beautiful</span>
+      </div>
+      <div style={{ marginTop: '20px' }}>
+        <h1 className="font-display hero-headline" style={{ fontSize: '64px', fontWeight: 800, lineHeight: 0.95, margin: 0, textShadow: '0 2px 20px rgba(0,0,0,0.3)' }}>
+          {greeting}
+        </h1>
+        <p className="font-editorial" style={{ fontSize: '20px', fontStyle: 'italic', opacity: 0.92, margin: '10px 0 0', maxWidth: '500px' }}>
+          one beautiful, productive, sunlit summer ahead.
+        </p>
+      </div>
+      <div style={{ display: 'flex', gap: '32px', marginTop: '24px', flexWrap: 'wrap' }}>
+        <Stat label="To graduation" value={`${gradDays} days`} />
+        <Stat label="Summer left" value={`${summerDays} days`} />
+        <Stat label="Tasks done" value={`${totalDone} / ${totalTasks}`} />
+      </div>
+    </div>
+  );
+}
+
+function Home({ buckets, onOpen }) {
   return (
     <div className="font-body" style={{ background: '#FAF6EF', minHeight: '100vh', padding: '20px' }}>
       <style>{STYLES}</style>
-
       <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-        <div
-          className="fade-up film"
-          style={{
-            background: `linear-gradient(135deg, rgba(76, 29, 149, 0.65), rgba(190, 24, 93, 0.55)), url('${HERO_PHOTO}'), linear-gradient(135deg, #4C1D95, #C026D3)`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            borderRadius: '32px',
-            padding: '44px 36px',
-            color: '#FFF7ED',
-            marginBottom: '14px',
-            position: 'relative',
-            overflow: 'hidden',
-            minHeight: '280px',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-          }}
-        >
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', opacity: 0.85, fontWeight: 500 }}>
-            <Sparkles size={15} />
-            <span>Summer 2026 · let's gooo</span>
-          </div>
-          <div style={{ marginTop: '24px' }}>
-            <h1 className="font-display hero-headline" style={{ fontSize: '72px', fontWeight: 800, lineHeight: 0.95, margin: 0, textShadow: '0 2px 20px rgba(0,0,0,0.2)' }}>
-              {greeting}
-            </h1>
-            <p className="font-editorial" style={{ fontSize: '22px', fontStyle: 'italic', opacity: 0.92, margin: '12px 0 0', maxWidth: '500px', fontWeight: 400 }}>
-              one beautiful, productive, sunlit summer ahead.
-            </p>
-          </div>
+        <Hero buckets={buckets} />
 
-          <div style={{ display: 'flex', gap: '36px', marginTop: '32px', flexWrap: 'wrap' }}>
-            <Stat label="To graduation" value={`${gradDays} days`} />
-            <Stat label="Summer left" value={`${summerDays} days`} />
-            <Stat label="Tasks done" value={`${totalDone} / ${totalTasks}`} />
-          </div>
+        {/* The bento grid: 6 cols × 8 rows of ~110px each */}
+        <div className="bento-grid" style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(6, 1fr)',
+          gridAutoRows: '110px',
+          gap: '12px',
+        }}>
+          {/* Row 1-2: Graduation (3 wide × 2) + scenic image (3 wide × 2) */}
+          <BucketBlock bucket={buckets[0]} onOpen={() => onOpen(buckets[0].id)} delay={0.1} gridCol="span 3" gridRow="span 2" />
+          <ImagePanel theme="graduation" delay={0.15} gridCol="span 3" gridRow="span 2" caption="celebrate the wins" />
+
+          {/* Row 3-4: scenic (2 wide × 2) + Move-out (2 × 2) + Room (2 × 2) */}
+          <ImagePanel theme="sunlight" delay={0.2} gridCol="span 2" gridRow="span 2" />
+          <BucketBlock bucket={buckets[1]} onOpen={() => onOpen(buckets[1].id)} delay={0.25} gridCol="span 2" gridRow="span 2" />
+          <BucketBlock bucket={buckets[2]} onOpen={() => onOpen(buckets[2].id)} delay={0.3} gridCol="span 2" gridRow="span 2" />
+
+          {/* Row 5: app launcher full width */}
+          <AppLauncherRow apps={APPS} gridCol="span 6" gridRow="span 1" delay={0.35} />
+
+          {/* Row 6-7: Classes (2 × 2) + image (2 × 2) + Career (2 × 2) */}
+          <BucketBlock bucket={buckets[3]} onOpen={() => onOpen(buckets[3].id)} delay={0.4} gridCol="span 2" gridRow="span 2" />
+          <ImagePanel theme="coffee" delay={0.45} gridCol="span 2" gridRow="span 2" caption="slow mornings" />
+          <BucketBlock bucket={buckets[4]} onOpen={() => onOpen(buckets[4].id)} delay={0.5} gridCol="span 2" gridRow="span 2" />
+
+          {/* Row 8-9: Income (3 × 2) + image (3 × 2) */}
+          <BucketBlock bucket={buckets[5]} onOpen={() => onOpen(buckets[5].id)} delay={0.55} gridCol="span 2" gridRow="span 2" />
+          <ImagePanel theme="flowers" delay={0.6} gridCol="span 2" gridRow="span 2" />
+          <BucketBlock bucket={buckets[6]} onOpen={() => onOpen(buckets[6].id)} delay={0.65} gridCol="span 2" gridRow="span 2" />
         </div>
 
-        <div className="bento-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '14px' }}>
-          {buckets.slice(0, 2).map((b, i) => (
-            <div key={b.id} style={{ gridColumn: 'span 3' }}>
-              <BucketCard bucket={b} onOpen={() => onOpen(b.id)} delay={0.1 + i * 0.06} />
-            </div>
-          ))}
-
-          <div style={{ gridColumn: 'span 6' }}>
-            <AppLauncherCard apps={APPS} />
-          </div>
-
-          {buckets.slice(2).map((b, i) => {
-            const span = [2, 2, 2, 3, 3][i];
-            return (
-              <div key={b.id} style={{ gridColumn: `span ${span}` }}>
-                <BucketCard bucket={b} onOpen={() => onOpen(b.id)} delay={0.6 + i * 0.06} />
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="font-editorial fade-up" style={{ textAlign: 'center', marginTop: '40px', marginBottom: '24px', fontSize: '20px', fontStyle: 'italic', color: '#9CA3AF', animationDelay: '1.2s' }}>
+        <div className="font-editorial fade-up" style={{ textAlign: 'center', marginTop: '36px', marginBottom: '24px', fontSize: '18px', fontStyle: 'italic', color: '#9CA3AF', animationDelay: '0.9s' }}>
           click any bucket to open its kanban
         </div>
       </div>
@@ -496,6 +548,7 @@ function Home({ buckets, onOpen }) {
 
 function BucketView({ bucket, onBack, onToggle, onMove, onAdd }) {
   const [newTask, setNewTask] = useState('');
+  const [calendarTask, setCalendarTask] = useState(null);
   const Icon = bucket.icon;
   const cols = [
     { id: 'todo', label: 'To do' },
@@ -513,103 +566,52 @@ function BucketView({ bucket, onBack, onToggle, onMove, onAdd }) {
   return (
     <div className="font-body" style={{ background: '#FAF6EF', minHeight: '100vh', padding: '20px' }}>
       <style>{STYLES}</style>
+      {calendarTask && (
+        <AddToCalendarPopup taskText={calendarTask} onClose={() => setCalendarTask(null)} accentColor={bucket.deep} />
+      )}
       <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
-
-        <button
-          onClick={onBack}
-          className="pill-btn fade-up"
-          style={{
-            background: 'rgba(255,255,255,0.7)',
-            border: 'none',
-            color: bucket.ink,
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px',
-            fontSize: '13px',
-            fontWeight: 600,
-            cursor: 'pointer',
-            padding: '8px 14px',
-            borderRadius: '99px',
-            marginBottom: '14px',
-            fontFamily: 'inherit',
-          }}
-        >
+        <button onClick={onBack} className="pill-btn fade-up" style={{
+          background: 'rgba(255,255,255,0.7)', border: 'none', color: bucket.deep,
+          display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 600,
+          cursor: 'pointer', padding: '8px 14px', borderRadius: '99px', marginBottom: '14px', fontFamily: 'inherit',
+        }}>
           <ArrowLeft size={14} /> dashboard
         </button>
 
-        <div
-          className="fade-up film"
-          style={{
-            background: `linear-gradient(135deg, ${bucket.tint}, ${bucket.tint}), url('${bucket.photo}'), ${bucket.fallback}`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            borderRadius: '28px',
-            padding: '36px',
-            marginBottom: '20px',
-            color: '#fff',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '22px',
-            minHeight: '180px',
-          }}
-        >
+        <div className="fade-up" style={{
+          background: bucket.color, borderRadius: '24px', padding: '32px',
+          marginBottom: '20px', color: '#fff', display: 'flex',
+          alignItems: 'center', gap: '20px', minHeight: '140px',
+        }}>
           <div style={{
-            background: 'rgba(255,255,255,0.25)',
-            backdropFilter: 'blur(8px)',
-            WebkitBackdropFilter: 'blur(8px)',
-            color: '#fff',
-            width: '72px',
-            height: '72px',
-            borderRadius: '22px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            flexShrink: 0,
+            background: 'rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
+            color: '#fff', width: '64px', height: '64px', borderRadius: '20px',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
           }}>
-            <Icon size={36} strokeWidth={2.2} />
+            <Icon size={32} strokeWidth={2.2} />
           </div>
           <div>
-            <h1 className="font-display" style={{ fontSize: '56px', fontWeight: 800, lineHeight: 0.95, margin: 0, textShadow: '0 2px 14px rgba(0,0,0,0.2)' }}>{bucket.title}</h1>
-            <p className="font-editorial" style={{ fontSize: '18px', fontStyle: 'italic', opacity: 0.95, margin: '8px 0 0' }}>{bucket.note} · {progressOf(bucket)}% complete</p>
+            <h1 className="font-display" style={{ fontSize: '48px', fontWeight: 800, lineHeight: 0.95, margin: 0 }}>{bucket.title}</h1>
+            <p className="font-editorial" style={{ fontSize: '17px', fontStyle: 'italic', opacity: 0.95, margin: '6px 0 0' }}>
+              {bucket.note} · {progressOf(bucket)}% complete
+            </p>
           </div>
         </div>
 
         <div className="fade-up" style={{ display: 'flex', gap: '10px', marginBottom: '20px', animationDelay: '0.1s' }}>
-          <input
-            value={newTask}
-            onChange={e => setNewTask(e.target.value)}
+          <input value={newTask} onChange={e => setNewTask(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleAdd()}
             placeholder="add a new task..."
             style={{
-              flex: 1,
-              padding: '14px 20px',
-              borderRadius: '16px',
-              border: 'none',
-              background: '#fff',
-              fontSize: '15px',
-              fontFamily: 'inherit',
-              outline: 'none',
+              flex: 1, padding: '14px 20px', borderRadius: '16px', border: 'none',
+              background: '#fff', fontSize: '15px', fontFamily: 'inherit', outline: 'none',
               boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-            }}
-          />
-          <button
-            onClick={handleAdd}
-            className="pill-btn"
-            style={{
-              background: bucket.accent,
-              color: '#fff',
-              border: 'none',
-              padding: '0 24px',
-              borderRadius: '16px',
-              fontSize: '15px',
-              fontWeight: 600,
-              cursor: 'pointer',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              fontFamily: 'inherit',
-            }}
-          >
+            }}/>
+          <button onClick={handleAdd} className="pill-btn" style={{
+            background: bucket.deep, color: '#fff', border: 'none', padding: '0 24px',
+            borderRadius: '16px', fontSize: '15px', fontWeight: 600, cursor: 'pointer',
+            display: 'flex', alignItems: 'center', gap: '6px', fontFamily: 'inherit',
+          }}>
             <Plus size={18} /> add
           </button>
         </div>
@@ -619,69 +621,46 @@ function BucketView({ bucket, onBack, onToggle, onMove, onAdd }) {
             const items = bucket.tasks.filter(t => t.col === col.id);
             return (
               <div key={col.id} className="fade-up" style={{
-                background: '#fff',
-                borderRadius: '22px',
-                padding: '20px',
-                minHeight: '320px',
-                animationDelay: `${0.15 + ci * 0.06}s`,
+                background: '#fff', borderRadius: '20px', padding: '20px',
+                minHeight: '320px', animationDelay: `${0.15 + ci * 0.06}s`,
               }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                  <div className="font-display" style={{ fontSize: '22px', fontWeight: 700, color: bucket.ink }}>{col.label}</div>
+                  <div className="font-display" style={{ fontSize: '20px', fontWeight: 700, color: bucket.deep }}>{col.label}</div>
                   <div style={{
-                    background: bucket.tint,
-                    color: '#fff',
-                    fontSize: '12px',
-                    fontWeight: 700,
-                    padding: '4px 12px',
-                    borderRadius: '99px',
+                    background: bucket.color, color: '#fff', fontSize: '12px', fontWeight: 700,
+                    padding: '4px 12px', borderRadius: '99px',
                   }}>{items.length}</div>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {items.map(task => (
                     <div key={task.id} style={{
-                      background: '#FAF6EF',
-                      padding: '12px 14px',
-                      borderRadius: '14px',
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: '10px',
-                      fontSize: '14px',
+                      background: '#FAF6EF', padding: '12px 14px', borderRadius: '14px',
+                      display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '14px',
                     }}>
-                      <button
-                        onClick={() => onToggle(bucket.id, task.id)}
-                        style={{
-                          background: task.done ? bucket.accent : 'transparent',
-                          border: task.done ? 'none' : `2px solid ${bucket.accent}55`,
-                          width: '22px',
-                          height: '22px',
-                          borderRadius: '8px',
-                          cursor: 'pointer',
-                          flexShrink: 0,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          marginTop: '1px',
-                          transition: 'all 0.2s ease',
-                        }}
-                      >
+                      <button onClick={() => onToggle(bucket.id, task.id)} style={{
+                        background: task.done ? bucket.deep : 'transparent',
+                        border: task.done ? 'none' : `2px solid ${bucket.deep}55`,
+                        width: '22px', height: '22px', borderRadius: '8px', cursor: 'pointer',
+                        flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        marginTop: '1px', transition: 'all 0.2s ease',
+                      }}>
                         {task.done && <Check size={13} color="#fff" strokeWidth={3} />}
                       </button>
                       <div style={{ flex: 1, textDecoration: task.done ? 'line-through' : 'none', opacity: task.done ? 0.5 : 1, color: '#1F2937', lineHeight: 1.4 }}>
                         {task.text}
                       </div>
-                      <select
-                        value={task.col}
-                        onChange={e => onMove(bucket.id, task.id, e.target.value)}
-                        style={{
-                          background: 'transparent',
-                          border: 'none',
-                          fontSize: '11px',
-                          color: bucket.accent,
-                          cursor: 'pointer',
-                          fontWeight: 700,
-                          fontFamily: 'inherit',
-                        }}
-                      >
+                      <button onClick={() => setCalendarTask(task.text)} className="cal-btn"
+                        title="Schedule on Google Calendar" style={{
+                          background: 'transparent', border: 'none', cursor: 'pointer',
+                          color: bucket.deep, padding: '2px', display: 'flex',
+                          alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '1px',
+                        }}>
+                        <CalendarIcon size={16} strokeWidth={2.2} />
+                      </button>
+                      <select value={task.col} onChange={e => onMove(bucket.id, task.id, e.target.value)} style={{
+                        background: 'transparent', border: 'none', fontSize: '11px',
+                        color: bucket.deep, cursor: 'pointer', fontWeight: 700, fontFamily: 'inherit',
+                      }}>
                         <option value="todo">todo</option>
                         <option value="doing">doing</option>
                         <option value="done">done</option>
@@ -713,14 +692,12 @@ export default function App() {
       tasks: b.tasks.map(t => t.id !== taskId ? t : { ...t, done: !t.done, col: !t.done ? 'done' : 'todo' }),
     }));
   };
-
   const move = (bucketId, taskId, newCol) => {
     setBuckets(prev => prev.map(b => b.id !== bucketId ? b : {
       ...b,
       tasks: b.tasks.map(t => t.id !== taskId ? t : { ...t, col: newCol, done: newCol === 'done' }),
     }));
   };
-
   const add = (bucketId, text) => {
     setBuckets(prev => prev.map(b => b.id !== bucketId ? b : {
       ...b,
