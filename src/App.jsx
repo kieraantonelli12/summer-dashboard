@@ -1,9 +1,27 @@
 import React, { useState } from 'react';
-import { ArrowLeft, Check, Plus, Sparkles, GraduationCap, Box, Palette, BookOpen, Briefcase, DollarSign, Music } from 'lucide-react';
+import { ArrowLeft, Check, Plus, Sparkles, GraduationCap, Box, Palette, BookOpen, Briefcase, DollarSign, Music, ExternalLink } from 'lucide-react';
 
 // ─── EDIT THESE TO MATCH YOUR LIFE ─────────────────────────────────────
 const GRADUATION_DATE = '2026-06-13';
 const SUMMER_END_DATE = '2026-08-31';
+// ───────────────────────────────────────────────────────────────────────
+
+// ─── YOUR APPS — uses Google's favicon service which pulls the REAL
+// favicon used by each site (the same icon you see in browser tabs).
+// To swap an app, change "domain" to the actual domain of the site.
+const APPS = [
+  { name: 'Canvas',    url: 'https://canvas.instructure.com',   domain: 'instructure.com',     color: '#E72429' },
+  { name: 'Outlook',   url: 'https://outlook.office.com/mail',  domain: 'outlook.office.com',  color: '#0078D4' },
+  { name: 'Gmail',     url: 'https://mail.google.com',          domain: 'mail.google.com',     color: '#EA4335' },
+  { name: 'Calendar',  url: 'https://calendar.google.com',      domain: 'calendar.google.com', color: '#1A73E8' },
+  { name: 'Teams',     url: 'https://teams.microsoft.com',      domain: 'teams.microsoft.com', color: '#4B53BC' },
+  { name: 'Claude',    url: 'https://claude.ai',                domain: 'claude.ai',           color: '#D97757' },
+  { name: 'ChatGPT',   url: 'https://chat.openai.com',          domain: 'chat.openai.com',     color: '#10A37F' },
+  { name: 'Spotify',   url: 'https://open.spotify.com',         domain: 'spotify.com',         color: '#1DB954' },
+  { name: 'LinkedIn',  url: 'https://linkedin.com/feed',        domain: 'linkedin.com',        color: '#0A66C2' },
+  { name: 'Instagram', url: 'https://instagram.com',            domain: 'instagram.com',       color: '#E4405F' },
+  { name: 'Pinterest', url: 'https://pinterest.com',            domain: 'pinterest.com',       color: '#E60023' },
+];
 // ───────────────────────────────────────────────────────────────────────
 
 const GREETINGS = [
@@ -35,6 +53,15 @@ const STYLES = `
   .film { filter: saturate(0.92) contrast(1.02); }
   .pill-btn { transition: all 0.2s ease; }
   .pill-btn:hover { transform: scale(1.02); }
+
+  .app-tile {
+    transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  }
+  .app-tile:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 20px -8px rgba(0,0,0,0.18);
+  }
+  .app-tile:active { transform: translateY(-1px) scale(1.02); }
 
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 99px; }
@@ -194,6 +221,129 @@ function progressOf(bucket) {
   return Math.round((done / bucket.tasks.length) * 100);
 }
 
+function AppTile({ app, delay }) {
+  const handleImgError = (e) => {
+    e.target.style.display = 'none';
+    const fallback = e.target.parentElement.querySelector('.fallback-letter');
+    if (fallback) fallback.style.display = 'block';
+  };
+
+  return (
+    <a
+      href={app.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="app-tile fade-up"
+      style={{
+        background: '#FFFFFF',
+        width: '100%',
+        aspectRatio: '1',
+        borderRadius: '20px',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#1F2937',
+        textDecoration: 'none',
+        border: '1px solid #F3F4F6',
+        boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
+        animationDelay: `${delay}s`,
+        cursor: 'pointer',
+        position: 'relative',
+        overflow: 'hidden',
+        padding: '8px',
+      }}
+      title={`Open ${app.name}`}
+    >
+      <img
+        src={`https://www.google.com/s2/favicons?domain=${app.domain}&sz=64`}
+        alt=""
+        width="32"
+        height="32"
+        loading="lazy"
+        onError={handleImgError}
+        style={{ borderRadius: '6px' }}
+      />
+      <span
+        className="fallback-letter font-display"
+        style={{
+          display: 'none',
+          fontSize: '24px',
+          fontWeight: 800,
+          color: app.color,
+          lineHeight: 1,
+        }}
+      >
+        {app.name[0]}
+      </span>
+      <div style={{
+        fontSize: '10px',
+        fontWeight: 600,
+        opacity: 0.85,
+        marginTop: '6px',
+        letterSpacing: '0.02em',
+        lineHeight: 1,
+        textAlign: 'center',
+        color: '#374151',
+      }}>
+        {app.name}
+      </div>
+    </a>
+  );
+}
+
+function AppLauncherCard({ apps }) {
+  return (
+    <div
+      className="fade-up"
+      style={{
+        background: '#FFFFFF',
+        borderRadius: '28px',
+        padding: '24px',
+        minHeight: '200px',
+        height: '100%',
+        animationDelay: '0.5s',
+        boxShadow: '0 1px 2px rgba(0,0,0,0.04)',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+        <div>
+          <div className="font-display" style={{ fontSize: '30px', fontWeight: 700, color: '#1F2937', lineHeight: 1 }}>
+            Quick launch
+          </div>
+          <div className="font-editorial" style={{ fontSize: '14px', color: '#9CA3AF', fontStyle: 'italic', marginTop: '4px' }}>
+            all your apps, one tap
+          </div>
+        </div>
+        <div style={{
+          background: '#F3F4F6',
+          color: '#6B7280',
+          width: '38px',
+          height: '38px',
+          borderRadius: '14px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          <ExternalLink size={18} strokeWidth={2.2} />
+        </div>
+      </div>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(74px, 1fr))',
+        gap: '10px',
+        flex: 1,
+      }}>
+        {apps.map((app, i) => (
+          <AppTile key={app.name} app={app} delay={0.55 + i * 0.03} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function BucketCard({ bucket, onOpen, delay }) {
   const Icon = bucket.icon;
   const pct = progressOf(bucket);
@@ -215,6 +365,7 @@ function BucketCard({ bucket, onOpen, delay }) {
         cursor: 'pointer',
         minHeight: '200px',
         width: '100%',
+        height: '100%',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
@@ -315,17 +466,27 @@ function Home({ buckets, onOpen }) {
         </div>
 
         <div className="bento-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: '14px' }}>
-          {buckets.map((b, i) => {
-            const span = [3, 3, 2, 2, 2, 3, 3][i];
+          {buckets.slice(0, 2).map((b, i) => (
+            <div key={b.id} style={{ gridColumn: 'span 3' }}>
+              <BucketCard bucket={b} onOpen={() => onOpen(b.id)} delay={0.1 + i * 0.06} />
+            </div>
+          ))}
+
+          <div style={{ gridColumn: 'span 6' }}>
+            <AppLauncherCard apps={APPS} />
+          </div>
+
+          {buckets.slice(2).map((b, i) => {
+            const span = [2, 2, 2, 3, 3][i];
             return (
               <div key={b.id} style={{ gridColumn: `span ${span}` }}>
-                <BucketCard bucket={b} onOpen={() => onOpen(b.id)} delay={0.1 + i * 0.06} />
+                <BucketCard bucket={b} onOpen={() => onOpen(b.id)} delay={0.6 + i * 0.06} />
               </div>
             );
           })}
         </div>
 
-        <div className="font-editorial fade-up" style={{ textAlign: 'center', marginTop: '40px', marginBottom: '24px', fontSize: '20px', fontStyle: 'italic', color: '#9CA3AF', animationDelay: '0.8s' }}>
+        <div className="font-editorial fade-up" style={{ textAlign: 'center', marginTop: '40px', marginBottom: '24px', fontSize: '20px', fontStyle: 'italic', color: '#9CA3AF', animationDelay: '1.2s' }}>
           click any bucket to open its kanban
         </div>
       </div>
