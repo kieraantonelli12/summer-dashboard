@@ -32,10 +32,10 @@ const GREETINGS = [
 ];
 
 const MY_PHOTOS = {
-  slot1: './photo1.jpg',
-  slot2: './photo3.jpg',
-  slot3: './photo2.jpg',
-  slot4: './photo4.jpg',
+  slot1: './photo1.jpeg',
+  slot2: './photo3.jpeg',
+  slot3: './photo2.jpeg',
+  slot4: './photo4.jpeg',
 };
 
 const STYLES = `
