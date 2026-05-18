@@ -32,10 +32,10 @@ const GREETINGS = [
 // ─── YOUR PHOTOS (in /public folder) ──────────────────────────────────
 // Vite's base config is './' so these paths resolve from the site root.
 const MY_PHOTOS = {
-  slot1: './photo1.jpg',  // Snoqualmie Falls
-  slot2: './photo3.jpg',  // Sunset sky
-  slot3: './photo2.jpg',  // Orange dahlias
-  slot4: './photo4.jpg',  // Snow-capped mountains
+  slot1: './photo1.jpeg',  // Snoqualmie Falls
+  slot2: './photo3.jpeg',  // Sunset sky
+  slot3: './photo2.jpeg',  // Orange dahlias
+  slot4: './photo4.jpeg',  // Snow-capped mountains
 };
 // ─────────────────────────────────────────────────────────────────────
 
