@@ -3,7 +3,7 @@ import { ArrowLeft, Check, Plus, Sparkles, GraduationCap, Box, Palette, BookOpen
 
 // ─── EDIT THESE TO MATCH YOUR LIFE ─────────────────────────────────────
 const GRADUATION_DATE = '2026-06-13';
-const SUMMER_END_DATE = '2026-08-31';
+const SUMMER_END_DATE = '2026-09-23';
 // ───────────────────────────────────────────────────────────────────────
 
 const STORAGE_KEY = 'summer-dashboard-buckets-v1';
@@ -23,13 +23,13 @@ const APPS = [
 ];
 
 const GREETINGS = [
-  "hey, you got this.",
-  "small steps, big season.",
-  "soft hustle, real growth.",
-  "you're doing the work.",
-  "rooted and rising.",
-  "one beautiful summer.",
-  "you're never wrong to do the right thing.",
+  "attitude reflects leadership, captain.",
+  "amaze, amaze, amaze.",
+  "with great ability comes great accountability.",
+  "you're never wrong to do the right thing." ",
+  "sometimes, a winner is a dreamer who just won’t quit.",
+  "don’t let anyone ever make you feel like you don’t deserve what you want.",
+  "yeah, maybe, but at least I won't be unoriginal.",
 ];
 
 const MY_PHOTOS = {
