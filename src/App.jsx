@@ -26,9 +26,9 @@ const GREETINGS = [
   'hey, you got this.',
   'small steps, big season.',
   'soft hustle, real growth.',
-  "you're doing the work.",
+  "keep up the good work.",
   'rooted and rising.',
-  'one beautiful summer.',
+  'you're thriving.',
 ];
 
 const MY_PHOTOS = {
@@ -574,20 +574,20 @@ function Home({ buckets, onOpen }) {
           gap: '12px',
         }}>
           <BucketBlock bucket={buckets[0]} onOpen={() => onOpen(buckets[0].id)} delay={0.1} gridCol="span 3" gridRow="span 2" />
-          <ImagePanel photo={MY_PHOTOS.slot1} delay={0.15} gridCol="span 3" gridRow="span 2" caption="snoqualmie falls" />
+          <ImagePanel photo={MY_PHOTOS.slot1} delay={0.15} gridCol="span 3" gridRow="span 2" caption="bloom season · photo by kiera antonelli" />
 
-          <ImagePanel photo={MY_PHOTOS.slot2} delay={0.2} gridCol="span 2" gridRow="span 2" caption="pacific nw skies" />
+          <ImagePanel photo={MY_PHOTOS.slot2} delay={0.2} gridCol="span 2" gridRow="span 2" caption="pacific nw skies · photo by kiera antonelli" />
           <BucketBlock bucket={buckets[1]} onOpen={() => onOpen(buckets[1].id)} delay={0.25} gridCol="span 2" gridRow="span 2" />
           <BucketBlock bucket={buckets[2]} onOpen={() => onOpen(buckets[2].id)} delay={0.3} gridCol="span 2" gridRow="span 2" />
 
           <AppLauncherRow apps={APPS} gridCol="span 6" gridRow="span 1" delay={0.35} />
 
           <BucketBlock bucket={buckets[3]} onOpen={() => onOpen(buckets[3].id)} delay={0.4} gridCol="span 2" gridRow="span 2" />
-          <ImagePanel photo={MY_PHOTOS.slot3} delay={0.45} gridCol="span 2" gridRow="span 2" caption="bloom season" />
+          <ImagePanel photo={MY_PHOTOS.slot3} delay={0.45} gridCol="span 2" gridRow="span 2" caption="snoqualmie falls · photo by kiera antonelli" />
           <BucketBlock bucket={buckets[4]} onOpen={() => onOpen(buckets[4].id)} delay={0.5} gridCol="span 2" gridRow="span 2" />
 
           <BucketBlock bucket={buckets[5]} onOpen={() => onOpen(buckets[5].id)} delay={0.55} gridCol="span 2" gridRow="span 2" />
-          <ImagePanel photo={MY_PHOTOS.slot4} delay={0.6} gridCol="span 2" gridRow="span 2" caption="the olympics" />
+          <ImagePanel photo={MY_PHOTOS.slot4} delay={0.6} gridCol="span 2" gridRow="span 2" caption="the olympics · photo by kiera antonelli" />
           <BucketBlock bucket={buckets[6]} onOpen={() => onOpen(buckets[6].id)} delay={0.65} gridCol="span 2" gridRow="span 2" />
         </div>
 
