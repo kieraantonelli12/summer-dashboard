@@ -1,10 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Check, Plus, Sparkles, GraduationCap, Box, Palette, BookOpen, Briefcase, DollarSign, Music, ExternalLink, Calendar as CalendarIcon, X } from 'lucide-react';
+import { ArrowLeft, Check, Plus, Sparkles, GraduationCap, Box, Palette, BookOpen, Briefcase, DollarSign, Music, ExternalLink, Calendar as CalendarIcon, X, Trash2 } from 'lucide-react';
 
 // ─── EDIT THESE TO MATCH YOUR LIFE ─────────────────────────────────────
 const GRADUATION_DATE = '2026-06-13';
 const SUMMER_END_DATE = '2026-08-31';
 // ───────────────────────────────────────────────────────────────────────
+
+const STORAGE_KEY = 'summer-dashboard-buckets-v1';
 
 const APPS = [
   { name: 'Canvas',    url: 'https://canvas.instructure.com',   domain: 'instructure.com',     color: '#E72429' },
@@ -29,15 +31,12 @@ const GREETINGS = [
   'one beautiful summer.',
 ];
 
-// ─── YOUR PHOTOS (in /public folder) ──────────────────────────────────
-// Vite's base config is './' so these paths resolve from the site root.
 const MY_PHOTOS = {
-  slot1: './photo1.jpeg',  // Snoqualmie Falls
-  slot2: './photo3.jpeg',  // Sunset sky
-  slot3: './photo2.jpeg',  // Orange dahlias
-  slot4: './photo4.jpeg',  // Snow-capped mountains
+  slot1: './photo1.jpg',
+  slot2: './photo3.jpg',
+  slot3: './photo2.jpg',
+  slot4: './photo4.jpg',
 };
-// ─────────────────────────────────────────────────────────────────────
 
 const STYLES = `
   .font-display { font-family: 'Bricolage Grotesque', system-ui, sans-serif; letter-spacing: -0.025em; }
@@ -71,8 +70,9 @@ const STYLES = `
   .app-tile:hover { transform: translateY(-3px) scale(1.05); box-shadow: 0 8px 20px -8px rgba(0,0,0,0.18); }
   .app-tile:active { transform: translateY(-1px) scale(1.02); }
 
-  .cal-btn { transition: all 0.18s ease; opacity: 0.55; }
-  .cal-btn:hover { opacity: 1; transform: scale(1.1); }
+  .icon-btn { transition: all 0.18s ease; opacity: 0.5; }
+  .icon-btn:hover { opacity: 1; transform: scale(1.12); }
+  .delete-btn:hover { color: #DC2626 !important; }
 
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.15); border-radius: 99px; }
@@ -88,9 +88,9 @@ const STYLES = `
   }
 `;
 
-const INITIAL_BUCKETS = [
+const DEFAULT_BUCKETS = [
   {
-    id: 'graduation', title: 'Graduation', icon: GraduationCap,
+    id: 'graduation', title: 'Graduation', iconName: 'GraduationCap',
     color: '#F472B6', deep: '#BE185D', soft: '#FCE7F3',
     note: '1 class needs love',
     tasks: [
@@ -103,7 +103,7 @@ const INITIAL_BUCKETS = [
     ],
   },
   {
-    id: 'moveout', title: 'Move-out', icon: Box,
+    id: 'moveout', title: 'Move-out', iconName: 'Box',
     color: '#34D399', deep: '#047857', soft: '#D1FAE5',
     note: 'EBT pending',
     tasks: [
@@ -117,7 +117,7 @@ const INITIAL_BUCKETS = [
     ],
   },
   {
-    id: 'room', title: 'New room', icon: Palette,
+    id: 'room', title: 'New room', iconName: 'Palette',
     color: '#A78BFA', deep: '#6D28D9', soft: '#EDE9FE',
     note: '4 pins saved',
     tasks: [
@@ -130,7 +130,7 @@ const INITIAL_BUCKETS = [
     ],
   },
   {
-    id: 'summer-classes', title: 'Summer classes', icon: BookOpen,
+    id: 'summer-classes', title: 'Summer classes', iconName: 'BookOpen',
     color: '#FBBF24', deep: '#B45309', soft: '#FEF3C7',
     note: 'Starts June 24',
     tasks: [
@@ -141,7 +141,7 @@ const INITIAL_BUCKETS = [
     ],
   },
   {
-    id: 'career', title: 'Career launch', icon: Briefcase,
+    id: 'career', title: 'Career launch', iconName: 'Briefcase',
     color: '#60A5FA', deep: '#1D4ED8', soft: '#DBEAFE',
     note: 'AI cert + portfolio',
     tasks: [
@@ -154,7 +154,7 @@ const INITIAL_BUCKETS = [
     ],
   },
   {
-    id: 'income', title: 'Summer income', icon: DollarSign,
+    id: 'income', title: 'Summer income', iconName: 'DollarSign',
     color: '#4ADE80', deep: '#166534', soft: '#DCFCE7',
     note: '$0 of $3k goal',
     tasks: [
@@ -166,7 +166,7 @@ const INITIAL_BUCKETS = [
     ],
   },
   {
-    id: 'activities', title: 'Summer fun', icon: Music,
+    id: 'activities', title: 'Summer fun', iconName: 'Music',
     color: '#FB923C', deep: '#C2410C', soft: '#FED7AA',
     note: '3 concerts saved',
     tasks: [
@@ -180,6 +180,35 @@ const INITIAL_BUCKETS = [
   },
 ];
 
+// Lucide icon resolver — bucket icons get reattached after loading from storage
+const ICON_MAP = { GraduationCap, Box, Palette, BookOpen, Briefcase, DollarSign, Music };
+function attachIcons(buckets) {
+  return buckets.map(b => ({ ...b, icon: ICON_MAP[b.iconName] }));
+}
+
+// Load from localStorage on first render. If anything looks wrong, fall back to defaults.
+function loadBuckets() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return attachIcons(DEFAULT_BUCKETS);
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed) || parsed.length === 0) return attachIcons(DEFAULT_BUCKETS);
+    return attachIcons(parsed);
+  } catch {
+    return attachIcons(DEFAULT_BUCKETS);
+  }
+}
+
+// Save to localStorage. Strip the icon component before serializing (functions don't serialize).
+function saveBuckets(buckets) {
+  try {
+    const serializable = buckets.map(({ icon, ...rest }) => rest);
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(serializable));
+  } catch (e) {
+    console.warn('Could not save to localStorage:', e);
+  }
+}
+
 const BING_DAILY_URL = 'https://bing.biturl.top/?resolution=1920&format=image&index=0&mkt=en-US';
 
 function daysUntil(dateString) {
@@ -189,6 +218,7 @@ function daysUntil(dateString) {
 }
 
 function progressOf(bucket) {
+  if (bucket.tasks.length === 0) return 0;
   const done = bucket.tasks.filter(t => t.done).length;
   return Math.round((done / bucket.tasks.length) * 100);
 }
@@ -303,6 +333,59 @@ function AddToCalendarPopup({ taskText, onClose, accentColor }) {
   );
 }
 
+function DeleteConfirmPopup({ taskText, onConfirm, onCancel }) {
+  return (
+    <div onClick={onCancel} className="fade-in" style={{
+      position: 'fixed', inset: 0, background: 'rgba(15, 23, 42, 0.45)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px',
+    }}>
+      <div onClick={(e) => e.stopPropagation()} className="scale-in" style={{
+        background: '#fff', borderRadius: '24px', padding: '28px',
+        width: '100%', maxWidth: '380px', boxShadow: '0 20px 50px -10px rgba(0,0,0,0.3)',
+      }}>
+        <div style={{
+          background: '#FEE2E2', color: '#DC2626',
+          width: '48px', height: '48px', borderRadius: '16px',
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          marginBottom: '16px',
+        }}>
+          <Trash2 size={22} />
+        </div>
+        <div className="font-display" style={{ fontSize: '24px', fontWeight: 700, color: '#1F2937', lineHeight: 1.1, marginBottom: '8px' }}>
+          Delete this task?
+        </div>
+        <div style={{ fontSize: '14px', color: '#6B7280', marginBottom: '4px' }}>
+          This will permanently remove:
+        </div>
+        <div style={{
+          background: '#FAF6EF', padding: '12px 14px', borderRadius: '12px',
+          fontSize: '14px', color: '#1F2937', marginBottom: '20px', lineHeight: 1.4,
+        }}>
+          {taskText}
+        </div>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button onClick={onCancel} className="pill-btn" style={{
+            background: '#F3F4F6', color: '#374151', border: 'none', flex: 1,
+            padding: '12px', borderRadius: '14px', fontSize: '14px', fontWeight: 600,
+            cursor: 'pointer', fontFamily: 'inherit',
+          }}>
+            Cancel
+          </button>
+          <button onClick={onConfirm} className="pill-btn" style={{
+            background: '#DC2626', color: '#fff', border: 'none', flex: 1,
+            padding: '12px', borderRadius: '14px', fontSize: '14px', fontWeight: 700,
+            cursor: 'pointer', fontFamily: 'inherit', display: 'flex',
+            alignItems: 'center', justifyContent: 'center', gap: '6px',
+          }}>
+            <Trash2 size={15} />
+            Delete
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function BucketBlock({ bucket, onOpen, delay, gridCol, gridRow }) {
   const Icon = bucket.icon;
   const pct = progressOf(bucket);
@@ -323,7 +406,7 @@ function BucketBlock({ bucket, onOpen, delay, gridCol, gridRow }) {
           color: '#fff', width: '38px', height: '38px', borderRadius: '12px',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-          <Icon size={18} strokeWidth={2.2} />
+          {Icon && <Icon size={18} strokeWidth={2.2} />}
         </div>
         <div className="font-display" style={{ fontSize: '28px', fontWeight: 800, lineHeight: 1 }}>
           {pct}%
@@ -490,24 +573,19 @@ function Home({ buckets, onOpen }) {
           gridAutoRows: '110px',
           gap: '12px',
         }}>
-          {/* Row 1-2: Graduation + Snoqualmie Falls */}
           <BucketBlock bucket={buckets[0]} onOpen={() => onOpen(buckets[0].id)} delay={0.1} gridCol="span 3" gridRow="span 2" />
           <ImagePanel photo={MY_PHOTOS.slot1} delay={0.15} gridCol="span 3" gridRow="span 2" caption="snoqualmie falls" />
 
-          {/* Row 3-4: Sunset sky + Move-out + Room */}
           <ImagePanel photo={MY_PHOTOS.slot2} delay={0.2} gridCol="span 2" gridRow="span 2" caption="pacific nw skies" />
           <BucketBlock bucket={buckets[1]} onOpen={() => onOpen(buckets[1].id)} delay={0.25} gridCol="span 2" gridRow="span 2" />
           <BucketBlock bucket={buckets[2]} onOpen={() => onOpen(buckets[2].id)} delay={0.3} gridCol="span 2" gridRow="span 2" />
 
-          {/* Row 5: App launcher */}
           <AppLauncherRow apps={APPS} gridCol="span 6" gridRow="span 1" delay={0.35} />
 
-          {/* Row 6-7: Classes + Dahlias + Career */}
           <BucketBlock bucket={buckets[3]} onOpen={() => onOpen(buckets[3].id)} delay={0.4} gridCol="span 2" gridRow="span 2" />
           <ImagePanel photo={MY_PHOTOS.slot3} delay={0.45} gridCol="span 2" gridRow="span 2" caption="bloom season" />
           <BucketBlock bucket={buckets[4]} onOpen={() => onOpen(buckets[4].id)} delay={0.5} gridCol="span 2" gridRow="span 2" />
 
-          {/* Row 8-9: Income + Mountains + Summer fun */}
           <BucketBlock bucket={buckets[5]} onOpen={() => onOpen(buckets[5].id)} delay={0.55} gridCol="span 2" gridRow="span 2" />
           <ImagePanel photo={MY_PHOTOS.slot4} delay={0.6} gridCol="span 2" gridRow="span 2" caption="the olympics" />
           <BucketBlock bucket={buckets[6]} onOpen={() => onOpen(buckets[6].id)} delay={0.65} gridCol="span 2" gridRow="span 2" />
@@ -521,9 +599,10 @@ function Home({ buckets, onOpen }) {
   );
 }
 
-function BucketView({ bucket, onBack, onToggle, onMove, onAdd }) {
+function BucketView({ bucket, onBack, onToggle, onMove, onAdd, onDelete }) {
   const [newTask, setNewTask] = useState('');
   const [calendarTask, setCalendarTask] = useState(null);
+  const [deleteTaskId, setDeleteTaskId] = useState(null);
   const Icon = bucket.icon;
   const cols = [
     { id: 'todo', label: 'To do' },
@@ -538,11 +617,23 @@ function BucketView({ bucket, onBack, onToggle, onMove, onAdd }) {
     }
   };
 
+  const taskToDelete = deleteTaskId ? bucket.tasks.find(t => t.id === deleteTaskId) : null;
+
   return (
     <div className="font-body" style={{ background: '#FAF6EF', minHeight: '100vh', padding: '20px' }}>
       <style>{STYLES}</style>
       {calendarTask && (
         <AddToCalendarPopup taskText={calendarTask} onClose={() => setCalendarTask(null)} accentColor={bucket.deep} />
+      )}
+      {taskToDelete && (
+        <DeleteConfirmPopup
+          taskText={taskToDelete.text}
+          onConfirm={() => {
+            onDelete(bucket.id, deleteTaskId);
+            setDeleteTaskId(null);
+          }}
+          onCancel={() => setDeleteTaskId(null)}
+        />
       )}
       <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
         <button onClick={onBack} className="pill-btn fade-up" style={{
@@ -563,7 +654,7 @@ function BucketView({ bucket, onBack, onToggle, onMove, onAdd }) {
             color: '#fff', width: '64px', height: '64px', borderRadius: '20px',
             display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
           }}>
-            <Icon size={32} strokeWidth={2.2} />
+            {Icon && <Icon size={32} strokeWidth={2.2} />}
           </div>
           <div>
             <h1 className="font-display" style={{ fontSize: '48px', fontWeight: 800, lineHeight: 0.95, margin: 0 }}>{bucket.title}</h1>
@@ -610,7 +701,7 @@ function BucketView({ bucket, onBack, onToggle, onMove, onAdd }) {
                   {items.map(task => (
                     <div key={task.id} style={{
                       background: '#FAF6EF', padding: '12px 14px', borderRadius: '14px',
-                      display: 'flex', alignItems: 'flex-start', gap: '10px', fontSize: '14px',
+                      display: 'flex', alignItems: 'flex-start', gap: '8px', fontSize: '14px',
                     }}>
                       <button onClick={() => onToggle(bucket.id, task.id)} style={{
                         background: task.done ? bucket.deep : 'transparent',
@@ -624,13 +715,21 @@ function BucketView({ bucket, onBack, onToggle, onMove, onAdd }) {
                       <div style={{ flex: 1, textDecoration: task.done ? 'line-through' : 'none', opacity: task.done ? 0.5 : 1, color: '#1F2937', lineHeight: 1.4 }}>
                         {task.text}
                       </div>
-                      <button onClick={() => setCalendarTask(task.text)} className="cal-btn"
+                      <button onClick={() => setCalendarTask(task.text)} className="icon-btn"
                         title="Schedule on Google Calendar" style={{
                           background: 'transparent', border: 'none', cursor: 'pointer',
                           color: bucket.deep, padding: '2px', display: 'flex',
                           alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '1px',
                         }}>
-                        <CalendarIcon size={16} strokeWidth={2.2} />
+                        <CalendarIcon size={15} strokeWidth={2.2} />
+                      </button>
+                      <button onClick={() => setDeleteTaskId(task.id)} className="icon-btn delete-btn"
+                        title="Delete task" style={{
+                          background: 'transparent', border: 'none', cursor: 'pointer',
+                          color: '#9CA3AF', padding: '2px', display: 'flex',
+                          alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '1px',
+                        }}>
+                        <Trash2 size={15} strokeWidth={2.2} />
                       </button>
                       <select value={task.col} onChange={e => onMove(bucket.id, task.id, e.target.value)} style={{
                         background: 'transparent', border: 'none', fontSize: '11px',
@@ -659,7 +758,12 @@ function BucketView({ bucket, onBack, onToggle, onMove, onAdd }) {
 
 export default function App() {
   const [view, setView] = useState('home');
-  const [buckets, setBuckets] = useState(INITIAL_BUCKETS);
+  const [buckets, setBuckets] = useState(() => loadBuckets());
+
+  // Save to localStorage on every change
+  useEffect(() => {
+    saveBuckets(buckets);
+  }, [buckets]);
 
   const toggle = (bucketId, taskId) => {
     setBuckets(prev => prev.map(b => b.id !== bucketId ? b : {
@@ -679,8 +783,14 @@ export default function App() {
       tasks: [...b.tasks, { id: Date.now(), text, done: false, col: 'todo' }],
     }));
   };
+  const deleteTask = (bucketId, taskId) => {
+    setBuckets(prev => prev.map(b => b.id !== bucketId ? b : {
+      ...b,
+      tasks: b.tasks.filter(t => t.id !== taskId),
+    }));
+  };
 
   if (view === 'home') return <Home buckets={buckets} onOpen={setView} />;
   const bucket = buckets.find(b => b.id === view);
-  return <BucketView bucket={bucket} onBack={() => setView('home')} onToggle={toggle} onMove={move} onAdd={add} />;
+  return <BucketView bucket={bucket} onBack={() => setView('home')} onToggle={toggle} onMove={move} onAdd={add} onDelete={deleteTask} />;
 }
