@@ -32,8 +32,8 @@ const GREETINGS = [
 ];
 
 const MY_PHOTOS = {
-  slot1: 'https://raw.githubusercontent.com/kieraantonelli12/summer-dashboard/main/photo1.jpeg',
-  slot2: 'https://raw.githubusercontent.com/kieraantonelli12/summer-dashboard/main/photo3.jpeg',
+  slot1: 'https://raw.githubusercontent.com/kieraantonelli12/summer-dashboard/main/photo3.jpeg',
+  slot2: 'https://raw.githubusercontent.com/kieraantonelli12/summer-dashboard/main/photo1.jpeg',
   slot3: 'https://raw.githubusercontent.com/kieraantonelli12/summer-dashboard/main/photo2.jpeg',
   slot4: 'https://raw.githubusercontent.com/kieraantonelli12/summer-dashboard/main/photo4.jpeg',
 };
