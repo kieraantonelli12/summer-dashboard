@@ -29,22 +29,15 @@ const GREETINGS = [
   'one beautiful summer.',
 ];
 
-// Themed Unsplash collections — Unsplash Source rotates these daily.
-// The {dateSeed} is replaced with today's date so the image stays the same all day
-// but changes each morning. Keep tags soft-film aesthetic.
-const IMAGE_THEMES = {
-  graduation:  'graduation,celebration,confetti,gold',
-  moveout:     'moving,boxes,packing,sunlight',
-  room:        'bedroom,plants,interior,cozy',
-  classes:     'books,coffee,study,desk',
-  career:      'workspace,laptop,desk,plants',
-  income:      'cafe,working,laptop,minimal',
-  activities:  'concert,summer,friends,golden',
-  flowers:     'wildflowers,bouquet,pastel',
-  coffee:      'latte,coffee,cafe,cozy',
-  sunlight:    'sunlight,window,plants,morning',
-  beach:       'beach,ocean,summer,pastel',
-  film:        'film,photography,vintage,warm',
+// Direct Unsplash CDN URLs (permanent, no API needed).
+// Easy to swap: open unsplash.com, find photo, right-click image → copy URL.
+const SCENIC_IMAGES = {
+  graduation:  'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&q=85&auto=format',
+  sunlight:    'https://images.unsplash.com/photo-1567606404787-3c4346d31894?w=800&q=85&auto=format',
+  coffee:      'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&q=85&auto=format',
+  flowers:     'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800&q=85&auto=format',
+  beach:       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=85&auto=format',
+  books:       'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=85&auto=format',
 };
 
 const STYLES = `
@@ -88,10 +81,9 @@ const STYLES = `
   @media (max-width: 720px) {
     .bento-grid {
       grid-template-columns: repeat(2, 1fr) !important;
-      grid-auto-rows: 120px !important;
+      grid-auto-rows: 130px !important;
     }
     .bento-grid > * { grid-column: span 2 !important; grid-row: span 1 !important; }
-    .bento-grid > .span-2-mobile { grid-column: span 2 !important; }
     .hero-headline { font-size: 44px !important; }
     .kanban-grid { grid-template-columns: 1fr !important; }
   }
@@ -189,15 +181,7 @@ const INITIAL_BUCKETS = [
   },
 ];
 
-// Bing daily image — uses free public proxy that allows browser CORS.
 const BING_DAILY_URL = 'https://bing.biturl.top/?resolution=1920&format=image&index=0&mkt=en-US';
-
-// Themed Unsplash image — featured/{theme} returns curated photos from Unsplash.
-// Add a daily seed so it changes every day but stays stable within a day.
-function unsplashURL(theme, w = 800, h = 800) {
-  const today = new Date().toISOString().slice(0, 10);
-  return `https://source.unsplash.com/featured/${w}x${h}/?${IMAGE_THEMES[theme] || theme}&sig=${today}`;
-}
 
 function daysUntil(dateString) {
   const target = new Date(dateString);
@@ -301,9 +285,6 @@ function AddToCalendarPopup({ taskText, onClose, accentColor }) {
               width: '100%', padding: '12px 14px', border: '1px solid #E5E7EB',
               borderRadius: '12px', fontSize: '15px', fontFamily: 'inherit', outline: 'none', color: '#1F2937',
             }}/>
-            <div style={{ fontSize: '11px', color: '#9CA3AF', marginTop: '4px' }}>
-              Defaults to a 1-hour block
-            </div>
           </div>
         )}
         <button onClick={handleAdd} disabled={!allDay && !time} className="pill-btn" style={{
@@ -323,7 +304,6 @@ function AddToCalendarPopup({ taskText, onClose, accentColor }) {
   );
 }
 
-// Solid-color bucket block (no background photo)
 function BucketBlock({ bucket, onOpen, delay, gridCol, gridRow }) {
   const Icon = bucket.icon;
   const pct = progressOf(bucket);
@@ -363,16 +343,15 @@ function BucketBlock({ bucket, onOpen, delay, gridCol, gridRow }) {
   );
 }
 
-// Scenic image panel — just a beautiful photo in the grid
 function ImagePanel({ theme, delay, gridCol, gridRow, caption }) {
+  const url = SCENIC_IMAGES[theme] || SCENIC_IMAGES.sunlight;
   return (
     <div className="grid-tile fade-up film" style={{
       gridColumn: gridCol, gridRow: gridRow,
-      background: `linear-gradient(135deg, rgba(0,0,0,0.05), rgba(0,0,0,0.15)), url('${unsplashURL(theme, 800, 800)}'), #E5E7EB`,
+      background: `linear-gradient(135deg, rgba(0,0,0,0.05), rgba(0,0,0,0.15)), url('${url}'), #E5E7EB`,
       backgroundSize: 'cover', backgroundPosition: 'center',
       borderRadius: '24px', animationDelay: `${delay}s`,
-      boxShadow: '0 1px 2px rgba(0,0,0,0.04)', position: 'relative',
-      overflow: 'hidden',
+      boxShadow: '0 1px 2px rgba(0,0,0,0.04)', position: 'relative', overflow: 'hidden',
     }}>
       {caption && (
         <div className="font-editorial" style={{
@@ -461,7 +440,6 @@ function Hero({ buckets }) {
   const gradDays = daysUntil(GRADUATION_DATE);
   const summerDays = daysUntil(SUMMER_END_DATE);
 
-  // Preload Bing daily so we know if it works
   useEffect(() => {
     const img = new Image();
     img.onload = () => setBingLoaded(true);
@@ -508,31 +486,25 @@ function Home({ buckets, onOpen }) {
       <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
         <Hero buckets={buckets} />
 
-        {/* The bento grid: 6 cols × 8 rows of ~110px each */}
         <div className="bento-grid" style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(6, 1fr)',
           gridAutoRows: '110px',
           gap: '12px',
         }}>
-          {/* Row 1-2: Graduation (3 wide × 2) + scenic image (3 wide × 2) */}
           <BucketBlock bucket={buckets[0]} onOpen={() => onOpen(buckets[0].id)} delay={0.1} gridCol="span 3" gridRow="span 2" />
           <ImagePanel theme="graduation" delay={0.15} gridCol="span 3" gridRow="span 2" caption="celebrate the wins" />
 
-          {/* Row 3-4: scenic (2 wide × 2) + Move-out (2 × 2) + Room (2 × 2) */}
           <ImagePanel theme="sunlight" delay={0.2} gridCol="span 2" gridRow="span 2" />
           <BucketBlock bucket={buckets[1]} onOpen={() => onOpen(buckets[1].id)} delay={0.25} gridCol="span 2" gridRow="span 2" />
           <BucketBlock bucket={buckets[2]} onOpen={() => onOpen(buckets[2].id)} delay={0.3} gridCol="span 2" gridRow="span 2" />
 
-          {/* Row 5: app launcher full width */}
           <AppLauncherRow apps={APPS} gridCol="span 6" gridRow="span 1" delay={0.35} />
 
-          {/* Row 6-7: Classes (2 × 2) + image (2 × 2) + Career (2 × 2) */}
           <BucketBlock bucket={buckets[3]} onOpen={() => onOpen(buckets[3].id)} delay={0.4} gridCol="span 2" gridRow="span 2" />
           <ImagePanel theme="coffee" delay={0.45} gridCol="span 2" gridRow="span 2" caption="slow mornings" />
           <BucketBlock bucket={buckets[4]} onOpen={() => onOpen(buckets[4].id)} delay={0.5} gridCol="span 2" gridRow="span 2" />
 
-          {/* Row 8-9: Income (3 × 2) + image (3 × 2) */}
           <BucketBlock bucket={buckets[5]} onOpen={() => onOpen(buckets[5].id)} delay={0.55} gridCol="span 2" gridRow="span 2" />
           <ImagePanel theme="flowers" delay={0.6} gridCol="span 2" gridRow="span 2" />
           <BucketBlock bucket={buckets[6]} onOpen={() => onOpen(buckets[6].id)} delay={0.65} gridCol="span 2" gridRow="span 2" />
