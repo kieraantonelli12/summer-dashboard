@@ -29,16 +29,15 @@ const GREETINGS = [
   'one beautiful summer.',
 ];
 
-// Direct Unsplash CDN URLs (permanent, no API needed).
-// Easy to swap: open unsplash.com, find photo, right-click image → copy URL.
-const SCENIC_IMAGES = {
-  graduation:  'https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=800&q=85&auto=format',
-  sunlight:    'https://images.unsplash.com/photo-1567606404787-3c4346d31894?w=800&q=85&auto=format',
-  coffee:      'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=800&q=85&auto=format',
-  flowers:     'https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=800&q=85&auto=format',
-  beach:       'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=800&q=85&auto=format',
-  books:       'https://images.unsplash.com/photo-1481627834876-b7833e8f5570?w=800&q=85&auto=format',
+// ─── YOUR PHOTOS (in /public folder) ──────────────────────────────────
+// Vite's base config is './' so these paths resolve from the site root.
+const MY_PHOTOS = {
+  slot1: './photo1.jpg',  // Snoqualmie Falls
+  slot2: './photo3.jpg',  // Sunset sky
+  slot3: './photo2.jpg',  // Orange dahlias
+  slot4: './photo4.jpg',  // Snow-capped mountains
 };
+// ─────────────────────────────────────────────────────────────────────
 
 const STYLES = `
   .font-display { font-family: 'Bricolage Grotesque', system-ui, sans-serif; letter-spacing: -0.025em; }
@@ -343,12 +342,11 @@ function BucketBlock({ bucket, onOpen, delay, gridCol, gridRow }) {
   );
 }
 
-function ImagePanel({ theme, delay, gridCol, gridRow, caption }) {
-  const url = SCENIC_IMAGES[theme] || SCENIC_IMAGES.sunlight;
+function ImagePanel({ photo, delay, gridCol, gridRow, caption }) {
   return (
     <div className="grid-tile fade-up film" style={{
       gridColumn: gridCol, gridRow: gridRow,
-      background: `linear-gradient(135deg, rgba(0,0,0,0.05), rgba(0,0,0,0.15)), url('${url}'), #E5E7EB`,
+      background: `linear-gradient(135deg, rgba(0,0,0,0.05), rgba(0,0,0,0.2)), url('${photo}'), #E5E7EB`,
       backgroundSize: 'cover', backgroundPosition: 'center',
       borderRadius: '24px', animationDelay: `${delay}s`,
       boxShadow: '0 1px 2px rgba(0,0,0,0.04)', position: 'relative', overflow: 'hidden',
@@ -357,7 +355,7 @@ function ImagePanel({ theme, delay, gridCol, gridRow, caption }) {
         <div className="font-editorial" style={{
           position: 'absolute', bottom: '14px', left: '16px', right: '16px',
           color: '#fff', fontSize: '14px', fontStyle: 'italic',
-          textShadow: '0 1px 8px rgba(0,0,0,0.4)', opacity: 0.95,
+          textShadow: '0 1px 8px rgba(0,0,0,0.5)', opacity: 0.95,
         }}>
           {caption}
         </div>
@@ -492,21 +490,26 @@ function Home({ buckets, onOpen }) {
           gridAutoRows: '110px',
           gap: '12px',
         }}>
+          {/* Row 1-2: Graduation + Snoqualmie Falls */}
           <BucketBlock bucket={buckets[0]} onOpen={() => onOpen(buckets[0].id)} delay={0.1} gridCol="span 3" gridRow="span 2" />
-          <ImagePanel theme="graduation" delay={0.15} gridCol="span 3" gridRow="span 2" caption="celebrate the wins" />
+          <ImagePanel photo={MY_PHOTOS.slot1} delay={0.15} gridCol="span 3" gridRow="span 2" caption="snoqualmie falls" />
 
-          <ImagePanel theme="sunlight" delay={0.2} gridCol="span 2" gridRow="span 2" />
+          {/* Row 3-4: Sunset sky + Move-out + Room */}
+          <ImagePanel photo={MY_PHOTOS.slot2} delay={0.2} gridCol="span 2" gridRow="span 2" caption="pacific nw skies" />
           <BucketBlock bucket={buckets[1]} onOpen={() => onOpen(buckets[1].id)} delay={0.25} gridCol="span 2" gridRow="span 2" />
           <BucketBlock bucket={buckets[2]} onOpen={() => onOpen(buckets[2].id)} delay={0.3} gridCol="span 2" gridRow="span 2" />
 
+          {/* Row 5: App launcher */}
           <AppLauncherRow apps={APPS} gridCol="span 6" gridRow="span 1" delay={0.35} />
 
+          {/* Row 6-7: Classes + Dahlias + Career */}
           <BucketBlock bucket={buckets[3]} onOpen={() => onOpen(buckets[3].id)} delay={0.4} gridCol="span 2" gridRow="span 2" />
-          <ImagePanel theme="coffee" delay={0.45} gridCol="span 2" gridRow="span 2" caption="slow mornings" />
+          <ImagePanel photo={MY_PHOTOS.slot3} delay={0.45} gridCol="span 2" gridRow="span 2" caption="bloom season" />
           <BucketBlock bucket={buckets[4]} onOpen={() => onOpen(buckets[4].id)} delay={0.5} gridCol="span 2" gridRow="span 2" />
 
+          {/* Row 8-9: Income + Mountains + Summer fun */}
           <BucketBlock bucket={buckets[5]} onOpen={() => onOpen(buckets[5].id)} delay={0.55} gridCol="span 2" gridRow="span 2" />
-          <ImagePanel theme="flowers" delay={0.6} gridCol="span 2" gridRow="span 2" />
+          <ImagePanel photo={MY_PHOTOS.slot4} delay={0.6} gridCol="span 2" gridRow="span 2" caption="the olympics" />
           <BucketBlock bucket={buckets[6]} onOpen={() => onOpen(buckets[6].id)} delay={0.65} gridCol="span 2" gridRow="span 2" />
         </div>
 
