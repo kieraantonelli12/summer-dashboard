@@ -26,10 +26,11 @@ const GREETINGS = [
   "attitude reflects leadership, captain.",
   "amaze, amaze, amaze.",
   "with great ability comes great accountability.",
-  "you're never wrong to do the right thing." ",
+  "you're never wrong to do the right thing.",
   "sometimes, a winner is a dreamer who just won’t quit.",
   "don’t let anyone ever make you feel like you don’t deserve what you want.",
   "yeah, maybe, but at least I won't be unoriginal.",
+  "sometimes one dream is enough to light up the whole sky.",
 ];
 
 const MY_PHOTOS = {
