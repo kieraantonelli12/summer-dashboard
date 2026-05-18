@@ -23,12 +23,12 @@ const APPS = [
 ];
 
 const GREETINGS = [
-  'hey, you got this.',
-  'small steps, big season.',
-  'soft hustle, real growth.',
-  "keep up the good work.",
-  'rooted and rising.',
-  'you're thriving.',
+  'attitude reflects leadership, captain.',
+  'amaze, amaze, amaze.',
+  'sometimes, a winner is a dreamer who just won’t quit.',
+  "you're never wrong to do the right thing.",
+  'with great ability comes great accountability.',
+  "yeah, maybe, but at least i won't be unoriginal.",
 ];
 
 const MY_PHOTOS = {
