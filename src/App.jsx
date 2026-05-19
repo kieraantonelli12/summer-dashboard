@@ -437,30 +437,32 @@ function AddBucketPopup({ onClose, onSave }) {
   const [caption, setCaption] = useState('');
   const [size, setSize] = useState('regular'); // 'regular' or 'wide'
 
-  const handleSaveTask = () => {
-    if (!title.trim()) return;
-    onSave({
-      id: `custom-${Date.now()}`,
-      title: title.trim(),
-      iconName,
-      paletteKey,
-      note: note.trim() || 'just added',
-      kind: 'task',
-      size,
-      tasks: [],
-    });
-
-  const handleSavePhoto = () => {
-    if (!photoUrl.trim()) return;
+const handleSaveTask = () => {
+  if (!title.trim()) return;
   onSave({
-      id: `photo-${Date.now()}`,
-      kind: 'photo',
-      photoUrl: photoUrl.trim(),
-      caption: caption.trim() || '',
-      size,
-    });
-    onClose();
-  };
+    id: `custom-${Date.now()}`,
+    title: title.trim(),
+    iconName,
+    paletteKey,
+    note: note.trim() || 'just added',
+    kind: 'task',
+    size,
+    tasks: [],
+  });
+  onClose(); // ← was also missing
+};
+
+const handleSavePhoto = () => {
+  if (!photoUrl.trim()) return;
+  onSave({
+    id: `photo-${Date.now()}`,
+    kind: 'photo',
+    photoUrl: photoUrl.trim(),
+    caption: caption.trim() || '',
+    size,
+  });
+  onClose();
+};
 
   return (
     <div onClick={onClose} className="fade-in" style={{
