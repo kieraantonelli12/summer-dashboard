@@ -11,15 +11,15 @@ const STORAGE_KEY = 'summer-dashboard-buckets-v1';
 const APPS = [
   { name: 'Canvas',    url: 'https://canvas.instructure.com',   domain: 'instructure.com',     color: '#E72429' },
   { name: 'Outlook',   url: 'https://outlook.office.com/mail',  domain: 'outlook.office.com',  color: '#0078D4' },
-  { name: 'Gmail',     url: 'https://mail.google.com',          domain: 'mail.google.com',     color: '#EA4335' },
   { name: 'Calendar',  url: 'https://calendar.google.com',      domain: 'calendar.google.com', color: '#1A73E8' },
+  { name: 'Gmail',     url: 'https://mail.google.com',          domain: 'mail.google.com',     color: '#EA4335' },
   { name: 'Teams',     url: 'https://teams.microsoft.com',      domain: 'teams.microsoft.com', color: '#4B53BC' },
   { name: 'Claude',    url: 'https://claude.ai',                domain: 'claude.ai',           color: '#D97757' },
   { name: 'ChatGPT',   url: 'https://chat.openai.com',          domain: 'chat.openai.com',     color: '#10A37F' },
   { name: 'Spotify',   url: 'https://open.spotify.com',         domain: 'spotify.com',         color: '#1DB954' },
   { name: 'LinkedIn',  url: 'https://linkedin.com/feed',        domain: 'linkedin.com',        color: '#0A66C2' },
-  { name: 'Instagram', url: 'https://instagram.com',            domain: 'instagram.com',       color: '#E4405F' },
   { name: 'Pinterest', url: 'https://pinterest.com',            domain: 'pinterest.com',       color: '#E60023' },
+  { name: 'Instagram', url: 'https://instagram.com',            domain: 'instagram.com',       color: '#E4405F' },
 ];
 
 const GREETINGS = [
