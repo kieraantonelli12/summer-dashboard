@@ -899,6 +899,7 @@ function AppLauncherRowStandalone({ apps, delay }) {
     </div>
   );
 }
+function Home({ buckets, onOpen, onAddBucket }) {
   const [showAddPopup, setShowAddPopup] = useState(false);
 
   // Built-in fixed layout positions for the original 7 buckets + 4 photos.
