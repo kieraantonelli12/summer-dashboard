@@ -873,7 +873,32 @@ function Hero({ buckets }) {
   );
 }
 
-function Home({ buckets, onOpen, onAddBucket }) {
+function AppLauncherRowStandalone({ apps, delay }) {
+  return (
+    <div className="fade-up" style={{
+      background: '#FFFBF5', borderRadius: '24px', padding: '18px 20px',
+      animationDelay: `${delay}s`, boxShadow: '0 2px 6px rgba(120, 60, 30, 0.08)',
+      display: 'flex', alignItems: 'center', gap: '16px',
+      marginBottom: '14px',
+    }}>
+      <div style={{ flexShrink: 0 }}>
+        <div className="font-display" style={{ fontSize: '20px', fontWeight: 700, color: '#3D2817', lineHeight: 1 }}>
+          Quick launch
+        </div>
+        <div className="font-editorial" style={{ fontSize: '12px', color: '#9C7A5C', fontStyle: 'italic', marginTop: '2px' }}>
+          all your apps
+        </div>
+      </div>
+      <div style={{
+        flex: 1, display: 'grid',
+        gridTemplateColumns: `repeat(${apps.length}, 1fr)`,
+        gap: '8px',
+      }}>
+        {apps.map((app, i) => (<AppTile key={app.name} app={app} delay={delay + 0.05 + i * 0.03} />))}
+      </div>
+    </div>
+  );
+}
   const [showAddPopup, setShowAddPopup] = useState(false);
 
   // Built-in fixed layout positions for the original 7 buckets + 4 photos.
@@ -886,8 +911,11 @@ function Home({ buckets, onOpen, onAddBucket }) {
       <style>{STYLES}</style>
       {showAddPopup && <AddBucketPopup onClose={() => setShowAddPopup(false)} onSave={onAddBucket} />}
       <div style={{ maxWidth: '1600px', margin: '0 auto' }}>
-        <Hero buckets={buckets} />
+       <Hero buckets={buckets} />
+        
+      <AppLauncherRowStandalone apps={APPS} delay={0.05} />
 
+        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <div className="bento-grid" style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(6, 1fr)',
@@ -901,7 +929,6 @@ function Home({ buckets, onOpen, onAddBucket }) {
           {builtIn[1] && <BucketBlock bucket={builtIn[1]} onOpen={() => onOpen(builtIn[1].id)} delay={0.25} gridCol="span 2" gridRow="span 2" />}
           {builtIn[2] && <BucketBlock bucket={builtIn[2]} onOpen={() => onOpen(builtIn[2].id)} delay={0.3} gridCol="span 2" gridRow="span 2" />}
 
-          <AppLauncherRow apps={APPS} gridCol="span 6" gridRow="span 1" delay={0.35} />
 
           {builtIn[3] && <BucketBlock bucket={builtIn[3]} onOpen={() => onOpen(builtIn[3].id)} delay={0.4} gridCol="span 2" gridRow="span 2" />}
           <ImagePanel photo={MY_PHOTOS.slot3} delay={0.45} gridCol="span 2" gridRow="span 2" caption="bloom season · photo by kiera antonelli" />
@@ -923,8 +950,9 @@ function Home({ buckets, onOpen, onAddBucket }) {
           ))}
 
           {/* The + add button always lives at the end */}
-          <AddBucketTile onClick={() => setShowAddPopup(true)}
+       <AddBucketTile onClick={() => setShowAddPopup(true)}
             delay={0.7 + customs.length * 0.05} gridCol="span 2" gridRow="span 2" />
+        </div>
         </div>
 
         <div className="font-editorial fade-up" style={{ textAlign: 'center', marginTop: '36px', marginBottom: '24px', fontSize: '18px', fontStyle: 'italic', color: '#9C7A5C', animationDelay: '0.9s' }}>
