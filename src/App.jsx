@@ -964,11 +964,12 @@ function Home({ buckets, onOpen, onAddBucket }) {
       <AppLauncherRowStandalone apps={APPS} delay={0.05} />
 
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-        <div className="bento-grid" style={{
+       <div className="bento-grid" style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(6, 1fr)',
           gridAutoRows: '110px',
           gap: '12px',
+          width: '100%',
         }}>
           {builtIn[0] && <BucketBlock bucket={builtIn[0]} onOpen={() => onOpen(builtIn[0].id)} delay={0.1} gridCol="span 3" gridRow="span 2" />}
           <ImagePanel photo={MY_PHOTOS.slot1} delay={0.15} gridCol="span 3" gridRow="span 2" caption="pacific nw skies · photo by kiera antonelli" />
