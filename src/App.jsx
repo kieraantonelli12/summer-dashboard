@@ -435,6 +435,7 @@ function AddBucketPopup({ onClose, onSave }) {
   // photo form state
   const [photoUrl, setPhotoUrl] = useState('');
   const [caption, setCaption] = useState('');
+  const [size, setSize] = useState('regular'); // 'regular' or 'wide'
 
   const handleSaveTask = () => {
     if (!title.trim()) return;
@@ -445,18 +446,18 @@ function AddBucketPopup({ onClose, onSave }) {
       paletteKey,
       note: note.trim() || 'just added',
       kind: 'task',
+      size,
       tasks: [],
     });
-    onClose();
-  };
 
   const handleSavePhoto = () => {
     if (!photoUrl.trim()) return;
-    onSave({
+  onSave({
       id: `photo-${Date.now()}`,
       kind: 'photo',
       photoUrl: photoUrl.trim(),
       caption: caption.trim() || '',
+      size,
     });
     onClose();
   };
@@ -561,6 +562,28 @@ function AddBucketPopup({ onClose, onSave }) {
               </div>
             </div>
 
+           <div style={{ marginBottom: '14px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#5C3D1F', marginBottom: '8px', letterSpacing: '0.02em', textTransform: 'uppercase' }}>
+                Size
+              </label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '6px' }}>
+                <div onClick={() => setSize('regular')} className={`picker-option ${size === 'regular' ? 'selected' : ''}`} style={{
+                  background: size === 'regular' ? '#3D2817' : '#F5E6D3',
+                  color: size === 'regular' ? '#fff' : '#5C3D1F',
+                  height: '40px', borderRadius: '10px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '13px', fontWeight: 600,
+                }}>Regular</div>
+                <div onClick={() => setSize('wide')} className={`picker-option ${size === 'wide' ? 'selected' : ''}`} style={{
+                  background: size === 'wide' ? '#3D2817' : '#F5E6D3',
+                  color: size === 'wide' ? '#fff' : '#5C3D1F',
+                  height: '40px', borderRadius: '10px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '13px', fontWeight: 600,
+                }}>Wide (2×)</div>
+              </div>
+            </div>
+
             <div style={{ marginBottom: '20px' }}>
               <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#5C3D1F', marginBottom: '8px', letterSpacing: '0.02em', textTransform: 'uppercase' }}>
                 Icon
@@ -633,6 +656,28 @@ function AddBucketPopup({ onClose, onSave }) {
                   borderRadius: '12px', fontSize: '15px', fontFamily: 'inherit', outline: 'none', color: '#3D2817',
                   background: '#fff', boxSizing: 'border-box',
                 }}/>
+            </div>
+
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#5C3D1F', marginBottom: '8px', letterSpacing: '0.02em', textTransform: 'uppercase' }}>
+                Size
+              </label>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '6px' }}>
+                <div onClick={() => setSize('regular')} className={`picker-option ${size === 'regular' ? 'selected' : ''}`} style={{
+                  background: size === 'regular' ? '#3D2817' : '#F5E6D3',
+                  color: size === 'regular' ? '#fff' : '#5C3D1F',
+                  height: '40px', borderRadius: '10px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '13px', fontWeight: 600,
+                }}>Regular</div>
+                <div onClick={() => setSize('wide')} className={`picker-option ${size === 'wide' ? 'selected' : ''}`} style={{
+                  background: size === 'wide' ? '#3D2817' : '#F5E6D3',
+                  color: size === 'wide' ? '#fff' : '#5C3D1F',
+                  height: '40px', borderRadius: '10px',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: '13px', fontWeight: 600,
+                }}>Wide (2×)</div>
+              </div>
             </div>
 
             {photoUrl.trim() && (
@@ -939,16 +984,18 @@ function Home({ buckets, onOpen, onAddBucket }) {
           <ImagePanel photo={MY_PHOTOS.slot4} delay={0.6} gridCol="span 2" gridRow="span 2" caption="the olympics · photo by kiera antonelli" />
           {builtIn[6] && <BucketBlock bucket={builtIn[6]} onOpen={() => onOpen(builtIn[6].id)} delay={0.65} gridCol="span 2" gridRow="span 2" />}
 
-          {/* Custom buckets the user added (task or photo, in order they added them) */}
-          {customs.map((b, i) => (
-            b.kind === 'photo' ? (
+          {/* Custom buckets the user added (task or photo, in order they added them).
+              Size: 'regular' = span 2 cols, 'wide' = span 4 cols. */}
+          {customs.map((b, i) => {
+            const colSpan = b.size === 'wide' ? 'span 4' : 'span 2';
+            return b.kind === 'photo' ? (
               <ImagePanel key={b.id} photo={b.photoUrl} delay={0.7 + i * 0.05}
-                gridCol="span 2" gridRow="span 2" caption={b.caption} />
+                gridCol={colSpan} gridRow="span 2" caption={b.caption} />
             ) : (
               <BucketBlock key={b.id} bucket={b} onOpen={() => onOpen(b.id)}
-                delay={0.7 + i * 0.05} gridCol="span 2" gridRow="span 2" />
-            )
-          ))}
+                delay={0.7 + i * 0.05} gridCol={colSpan} gridRow="span 2" />
+            );
+          })}
 
           {/* The + add button always lives at the end */}
        <AddBucketTile onClick={() => setShowAddPopup(true)}
