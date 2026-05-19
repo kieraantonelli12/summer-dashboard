@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { ArrowLeft, Check, Plus, Sparkles, GraduationCap, Box, Palette, BookOpen, Briefcase, DollarSign, Music, ExternalLink, Calendar as CalendarIcon, X, Trash2 } from 'lucide-react';
+import { ArrowLeft, Check, Plus, Sparkles, GraduationCap, Box, Palette, BookOpen, Briefcase, DollarSign, Music, ExternalLink, Calendar as CalendarIcon, X, Trash2, Image as ImageIcon, Heart, Star, Coffee, Sun, Camera } from 'lucide-react';
 
 // ─── EDIT THESE TO MATCH YOUR LIFE ─────────────────────────────────────
 const GRADUATION_DATE = '2026-06-13';
-const SUMMER_END_DATE = '2026-08-31';
+const SUMMER_END_DATE = '2026-09-23';
 // ───────────────────────────────────────────────────────────────────────
 
 const STORAGE_KEY = 'summer-dashboard-buckets-v1';
@@ -11,24 +11,24 @@ const STORAGE_KEY = 'summer-dashboard-buckets-v1';
 const APPS = [
   { name: 'Canvas',    url: 'https://canvas.instructure.com',   domain: 'instructure.com',     color: '#E72429' },
   { name: 'Outlook',   url: 'https://outlook.office.com/mail',  domain: 'outlook.office.com',  color: '#0078D4' },
-  { name: 'Calendar',  url: 'https://calendar.google.com',      domain: 'calendar.google.com', color: '#1A73E8' },
   { name: 'Gmail',     url: 'https://mail.google.com',          domain: 'mail.google.com',     color: '#EA4335' },
+  { name: 'Calendar',  url: 'https://calendar.google.com',      domain: 'calendar.google.com', color: '#1A73E8' },
   { name: 'Teams',     url: 'https://teams.microsoft.com',      domain: 'teams.microsoft.com', color: '#4B53BC' },
   { name: 'Claude',    url: 'https://claude.ai',                domain: 'claude.ai',           color: '#D97757' },
   { name: 'ChatGPT',   url: 'https://chat.openai.com',          domain: 'chat.openai.com',     color: '#10A37F' },
   { name: 'Spotify',   url: 'https://open.spotify.com',         domain: 'spotify.com',         color: '#1DB954' },
   { name: 'LinkedIn',  url: 'https://linkedin.com/feed',        domain: 'linkedin.com',        color: '#0A66C2' },
-  { name: 'Pinterest', url: 'https://pinterest.com',            domain: 'pinterest.com',       color: '#E60023' },
   { name: 'Instagram', url: 'https://instagram.com',            domain: 'instagram.com',       color: '#E4405F' },
+  { name: 'Pinterest', url: 'https://pinterest.com',            domain: 'pinterest.com',       color: '#E60023' },
 ];
 
 const GREETINGS = [
- "attitude reflects leadership, captain.",
+  "attitude reflects leadership, captain.",
   "amaze, amaze, amaze.",
   "with great ability comes great accountability.",
   "you're never wrong to do the right thing.",
-  "sometimes, a winner is a dreamer who just won’t quit.",
-  "don’t let anyone ever make you feel like you don’t deserve what you want.",
+  "sometimes, a winner is a dreamer who just won't quit.",
+  "don't let anyone ever make you feel like you don't deserve what you want.",
   "yeah, maybe, but at least I won't be unoriginal.",
   "sometimes one dream is enough to light up the whole sky.",
 ];
@@ -40,15 +40,25 @@ const MY_PHOTOS = {
   slot4: 'https://raw.githubusercontent.com/kieraantonelli12/summer-dashboard/main/photo4.jpeg',
 };
 
+// Each palette: gradient (card bg) + deep (accents/text) + soft (task row bg)
 const MED_PALETTE = {
-  graduation: { gradient: 'linear-gradient(135deg, #E85C3F 0%, #F2B544 100%)', deep: '#9C2E1A', soft: '#FCE4D6' },
-  moveout:    { gradient: 'linear-gradient(135deg, #2E5C5C 0%, #5C8B8B 100%)', deep: '#1A3838', soft: '#D6E8E8' },
-  room:       { gradient: 'linear-gradient(135deg, #8B6F47 0%, #B89B6A 100%)', deep: '#4A3A20', soft: '#E8DCC4' },
-  classes:    { gradient: 'linear-gradient(135deg, #F2B544 0%, #FFD683 100%)', deep: '#7A4F0A', soft: '#FCE9C4' },
-  career:     { gradient: 'linear-gradient(135deg, #5C8B8B 0%, #8FB5B5 100%)', deep: '#274545', soft: '#D9EAEA' },
-  income:     { gradient: 'linear-gradient(135deg, #2E5C5C 0%, #E85C3F 100%)', deep: '#1A3838', soft: '#FAD7CB' },
-  activities: { gradient: 'linear-gradient(135deg, #C84C2E 0%, #E85C3F 100%)', deep: '#7A1E08', soft: '#FAD7CB' },
+  graduation: { gradient: 'linear-gradient(135deg, #E85C3F 0%, #F2B544 100%)', deep: '#9C2E1A', soft: '#FCE4D6', label: 'Sunset' },
+  moveout:    { gradient: 'linear-gradient(135deg, #2E5C5C 0%, #5C8B8B 100%)', deep: '#1A3838', soft: '#D6E8E8', label: 'Deep teal' },
+  room:       { gradient: 'linear-gradient(135deg, #8B6F47 0%, #B89B6A 100%)', deep: '#4A3A20', soft: '#E8DCC4', label: 'Olive brown' },
+  classes:    { gradient: 'linear-gradient(135deg, #F2B544 0%, #FFD683 100%)', deep: '#7A4F0A', soft: '#FCE9C4', label: 'Mustard' },
+  career:     { gradient: 'linear-gradient(135deg, #5C8B8B 0%, #8FB5B5 100%)', deep: '#274545', soft: '#D9EAEA', label: 'Sea glass' },
+  income:     { gradient: 'linear-gradient(135deg, #2E5C5C 0%, #E85C3F 100%)', deep: '#1A3838', soft: '#FAD7CB', label: 'Teal to coral' },
+  activities: { gradient: 'linear-gradient(135deg, #C84C2E 0%, #E85C3F 100%)', deep: '#7A1E08', soft: '#FAD7CB', label: 'Brick' },
 };
+
+// Picker options for new buckets
+const PALETTE_OPTIONS = Object.keys(MED_PALETTE);
+
+const ICON_MAP = {
+  GraduationCap, Box, Palette, BookOpen, Briefcase, DollarSign, Music,
+  Heart, Star, Coffee, Sun, Camera, Sparkles,
+};
+const ICON_OPTIONS = ['GraduationCap', 'Box', 'Palette', 'BookOpen', 'Briefcase', 'DollarSign', 'Music', 'Heart', 'Star', 'Coffee', 'Sun', 'Camera', 'Sparkles'];
 
 const STYLES = `
   .font-display { font-family: 'Bricolage Grotesque', system-ui, sans-serif; letter-spacing: -0.025em; }
@@ -86,21 +96,32 @@ const STYLES = `
   .icon-btn:hover { opacity: 1; transform: scale(1.12); }
   .delete-btn:hover { color: #C84C2E !important; }
 
+  .add-tile {
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+  }
+  .add-tile:hover {
+    border-color: #C84C2E !important;
+    background: #FAEFE0 !important;
+    transform: translateY(-3px);
+  }
+
+  .picker-option {
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+  .picker-option:hover { transform: scale(1.05); }
+  .picker-option.selected { transform: scale(1.05); box-shadow: 0 0 0 3px #3D2817; }
+
   ::-webkit-scrollbar { width: 6px; }
   ::-webkit-scrollbar-thumb { background: rgba(120,80,40,0.2); border-radius: 99px; }
 
-  /* The natural-flow bento grid. Uses auto-fill so cards stay their natural
-     size and just flow to the next row when they run out of horizontal space. */
-  .flow-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-    gap: 14px;
-  }
-  .flow-grid > .flow-wide { grid-column: span 2; }
-
-  @media (max-width: 760px) {
-    .flow-grid { grid-template-columns: 1fr; }
-    .flow-grid > .flow-wide { grid-column: span 1; }
+  @media (max-width: 720px) {
+    .bento-grid {
+      grid-template-columns: repeat(2, 1fr) !important;
+      grid-auto-rows: 130px !important;
+    }
+    .bento-grid > * { grid-column: span 2 !important; grid-row: span 1 !important; }
     .hero-headline { font-size: 44px !important; }
     .kanban-grid { grid-template-columns: 1fr !important; }
   }
@@ -109,7 +130,7 @@ const STYLES = `
 const DEFAULT_BUCKETS = [
   {
     id: 'graduation', title: 'Graduation', iconName: 'GraduationCap',
-    paletteKey: 'graduation', note: '1 class needs love',
+    paletteKey: 'graduation', note: '1 class needs love', kind: 'task',
     tasks: [
       { id: 1, text: 'Meet financial planning prof for extra credit', done: false, col: 'doing' },
       { id: 2, text: 'Bring materiality grade from C to B-', done: false, col: 'todo' },
@@ -121,7 +142,7 @@ const DEFAULT_BUCKETS = [
   },
   {
     id: 'moveout', title: 'Move-out', iconName: 'Box',
-    paletteKey: 'moveout', note: 'EBT pending',
+    paletteKey: 'moveout', note: 'EBT pending', kind: 'task',
     tasks: [
       { id: 1, text: 'Cancel EBT benefits', done: false, col: 'todo' },
       { id: 2, text: 'Schedule lease end inspection', done: false, col: 'todo' },
@@ -134,7 +155,7 @@ const DEFAULT_BUCKETS = [
   },
   {
     id: 'room', title: 'New room', iconName: 'Palette',
-    paletteKey: 'room', note: '4 pins saved',
+    paletteKey: 'room', note: '4 pins saved', kind: 'task',
     tasks: [
       { id: 1, text: 'Build Pinterest mood board', done: true, col: 'done' },
       { id: 2, text: 'Measure room dimensions', done: false, col: 'todo' },
@@ -146,7 +167,7 @@ const DEFAULT_BUCKETS = [
   },
   {
     id: 'summer-classes', title: 'Summer classes', iconName: 'BookOpen',
-    paletteKey: 'classes', note: 'Starts June 24',
+    paletteKey: 'classes', note: 'Starts June 24', kind: 'task',
     tasks: [
       { id: 1, text: 'Confirm registration and credits', done: false, col: 'todo' },
       { id: 2, text: 'Order textbooks early', done: false, col: 'todo' },
@@ -156,7 +177,7 @@ const DEFAULT_BUCKETS = [
   },
   {
     id: 'career', title: 'Career launch', iconName: 'Briefcase',
-    paletteKey: 'career', note: 'AI cert + portfolio',
+    paletteKey: 'career', note: 'AI cert + portfolio', kind: 'task',
     tasks: [
       { id: 1, text: 'Refresh LinkedIn photo and headline', done: false, col: 'todo' },
       { id: 2, text: 'Pick AI certification (Google, MSFT, IBM)', done: false, col: 'doing' },
@@ -168,7 +189,7 @@ const DEFAULT_BUCKETS = [
   },
   {
     id: 'income', title: 'Summer income', iconName: 'DollarSign',
-    paletteKey: 'income', note: '$0 of $3k goal',
+    paletteKey: 'income', note: '$0 of $3k goal', kind: 'task',
     tasks: [
       { id: 1, text: 'Set up Upwork or Contra profile', done: false, col: 'todo' },
       { id: 2, text: 'Define freelance PM packages', done: false, col: 'todo' },
@@ -179,7 +200,7 @@ const DEFAULT_BUCKETS = [
   },
   {
     id: 'activities', title: 'Summer fun', iconName: 'Music',
-    paletteKey: 'activities', note: '3 concerts saved',
+    paletteKey: 'activities', note: '3 concerts saved', kind: 'task',
     tasks: [
       { id: 1, text: 'Concert tickets locked in', done: false, col: 'todo' },
       { id: 2, text: 'Plug in with home church', done: false, col: 'todo' },
@@ -191,9 +212,8 @@ const DEFAULT_BUCKETS = [
   },
 ];
 
-const ICON_MAP = { GraduationCap, Box, Palette, BookOpen, Briefcase, DollarSign, Music };
 function attachIcons(buckets) {
-  return buckets.map(b => ({ ...b, icon: ICON_MAP[b.iconName] }));
+  return buckets.map(b => ({ ...b, icon: ICON_MAP[b.iconName] || ICON_MAP.Star }));
 }
 
 function loadBuckets() {
@@ -203,9 +223,12 @@ function loadBuckets() {
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed) || parsed.length === 0) return attachIcons(DEFAULT_BUCKETS);
     const migrated = parsed.map(b => {
-      if (b.paletteKey) return b;
       const map = { graduation: 'graduation', moveout: 'moveout', room: 'room', 'summer-classes': 'classes', career: 'career', income: 'income', activities: 'activities' };
-      return { ...b, paletteKey: map[b.id] || 'graduation' };
+      return {
+        ...b,
+        paletteKey: b.paletteKey || map[b.id] || 'graduation',
+        kind: b.kind || 'task',
+      };
     });
     return attachIcons(migrated);
   } catch {
@@ -231,7 +254,7 @@ function daysUntil(dateString) {
 }
 
 function progressOf(bucket) {
-  if (bucket.tasks.length === 0) return 0;
+  if (!bucket.tasks || bucket.tasks.length === 0) return 0;
   const done = bucket.tasks.filter(t => t.done).length;
   return Math.round((done / bucket.tasks.length) * 100);
 }
@@ -275,7 +298,7 @@ function AddToCalendarPopup({ taskText, onClose, accentColor }) {
       display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px',
     }}>
       <div onClick={(e) => e.stopPropagation()} className="scale-in" style={{
-        background: '#FFFFFF', borderRadius: '24px', padding: '28px',
+        background: '#FFFBF5', borderRadius: '24px', padding: '28px',
         width: '100%', maxWidth: '420px', boxShadow: '0 20px 50px -10px rgba(120, 60, 30, 0.4)',
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
@@ -355,7 +378,7 @@ function DeleteConfirmPopup({ taskText, onConfirm, onCancel }) {
       display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px',
     }}>
       <div onClick={(e) => e.stopPropagation()} className="scale-in" style={{
-        background: '#FFFFFF', borderRadius: '24px', padding: '28px',
+        background: '#FFFBF5', borderRadius: '24px', padding: '28px',
         width: '100%', maxWidth: '380px', boxShadow: '0 20px 50px -10px rgba(120, 60, 30, 0.4)',
       }}>
         <div style={{
@@ -401,38 +424,291 @@ function DeleteConfirmPopup({ taskText, onConfirm, onCancel }) {
   );
 }
 
-function BucketBlock({ bucket, onOpen, delay, wide }) {
+// ─── NEW: Add Bucket popup ─────────────────────────────────────────────
+function AddBucketPopup({ onClose, onSave }) {
+  const [step, setStep] = useState('choose'); // 'choose' | 'task' | 'photo'
+  // task form state
+  const [title, setTitle] = useState('');
+  const [note, setNote] = useState('');
+  const [paletteKey, setPaletteKey] = useState('graduation');
+  const [iconName, setIconName] = useState('Star');
+  // photo form state
+  const [photoUrl, setPhotoUrl] = useState('');
+  const [caption, setCaption] = useState('');
+
+  const handleSaveTask = () => {
+    if (!title.trim()) return;
+    onSave({
+      id: `custom-${Date.now()}`,
+      title: title.trim(),
+      iconName,
+      paletteKey,
+      note: note.trim() || 'just added',
+      kind: 'task',
+      tasks: [],
+    });
+    onClose();
+  };
+
+  const handleSavePhoto = () => {
+    if (!photoUrl.trim()) return;
+    onSave({
+      id: `photo-${Date.now()}`,
+      kind: 'photo',
+      photoUrl: photoUrl.trim(),
+      caption: caption.trim() || '',
+    });
+    onClose();
+  };
+
+  return (
+    <div onClick={onClose} className="fade-in" style={{
+      position: 'fixed', inset: 0, background: 'rgba(60, 30, 15, 0.5)',
+      display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '20px',
+    }}>
+      <div onClick={(e) => e.stopPropagation()} className="scale-in" style={{
+        background: '#FFFBF5', borderRadius: '24px', padding: '28px',
+        width: '100%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto',
+        boxShadow: '0 20px 50px -10px rgba(120, 60, 30, 0.4)',
+      }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '20px' }}>
+          <div>
+            <div className="font-display" style={{ fontSize: '24px', fontWeight: 700, color: '#3D2817', lineHeight: 1.1 }}>
+              {step === 'choose' && 'Add a new bucket'}
+              {step === 'task' && 'New task bucket'}
+              {step === 'photo' && 'New photo bucket'}
+            </div>
+            <div className="font-editorial" style={{ fontSize: '14px', color: '#9C7A5C', fontStyle: 'italic', marginTop: '4px' }}>
+              {step === 'choose' && 'what kind of bucket?'}
+              {step === 'task' && 'pick a color, icon, and name'}
+              {step === 'photo' && 'paste an image url'}
+            </div>
+          </div>
+          <button onClick={onClose} style={{
+            background: '#F5E6D3', border: 'none', width: '34px', height: '34px',
+            borderRadius: '12px', cursor: 'pointer', display: 'flex',
+            alignItems: 'center', justifyContent: 'center', color: '#9C7A5C',
+          }}>
+            <X size={18} />
+          </button>
+        </div>
+
+        {step === 'choose' && (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+            <button onClick={() => setStep('task')} className="pill-btn" style={{
+              background: 'linear-gradient(135deg, #E85C3F 0%, #F2B544 100%)',
+              color: '#fff', border: 'none', padding: '24px 16px', borderRadius: '18px',
+              cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left',
+              display: 'flex', flexDirection: 'column', gap: '8px',
+            }}>
+              <Check size={28} />
+              <div className="font-display" style={{ fontSize: '22px', fontWeight: 700, lineHeight: 1 }}>Task bucket</div>
+              <div style={{ fontSize: '12px', opacity: 0.92 }}>kanban + checklist for a project or area of life</div>
+            </button>
+            <button onClick={() => setStep('photo')} className="pill-btn" style={{
+              background: 'linear-gradient(135deg, #2E5C5C 0%, #5C8B8B 100%)',
+              color: '#fff', border: 'none', padding: '24px 16px', borderRadius: '18px',
+              cursor: 'pointer', fontFamily: 'inherit', textAlign: 'left',
+              display: 'flex', flexDirection: 'column', gap: '8px',
+            }}>
+              <ImageIcon size={28} />
+              <div className="font-display" style={{ fontSize: '22px', fontWeight: 700, lineHeight: 1 }}>Photo bucket</div>
+              <div style={{ fontSize: '12px', opacity: 0.92 }}>a beautiful image, no tasks attached</div>
+            </button>
+          </div>
+        )}
+
+        {step === 'task' && (
+          <div>
+            <div style={{ marginBottom: '14px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#5C3D1F', marginBottom: '6px', letterSpacing: '0.02em', textTransform: 'uppercase' }}>
+                Title
+              </label>
+              <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Reading list"
+                style={{
+                  width: '100%', padding: '12px 14px', border: '1px solid #E8D5BC',
+                  borderRadius: '12px', fontSize: '15px', fontFamily: 'inherit', outline: 'none', color: '#3D2817',
+                  background: '#fff', boxSizing: 'border-box',
+                }}/>
+            </div>
+
+            <div style={{ marginBottom: '14px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#5C3D1F', marginBottom: '6px', letterSpacing: '0.02em', textTransform: 'uppercase' }}>
+                Subtitle (optional)
+              </label>
+              <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="e.g. 6 books picked"
+                style={{
+                  width: '100%', padding: '12px 14px', border: '1px solid #E8D5BC',
+                  borderRadius: '12px', fontSize: '15px', fontFamily: 'inherit', outline: 'none', color: '#3D2817',
+                  background: '#fff', boxSizing: 'border-box',
+                }}/>
+            </div>
+
+            <div style={{ marginBottom: '14px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#5C3D1F', marginBottom: '8px', letterSpacing: '0.02em', textTransform: 'uppercase' }}>
+                Color
+              </label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '6px' }}>
+                {PALETTE_OPTIONS.map(key => (
+                  <div key={key} onClick={() => setPaletteKey(key)}
+                    className={`picker-option ${paletteKey === key ? 'selected' : ''}`}
+                    title={MED_PALETTE[key].label}
+                    style={{
+                      background: MED_PALETTE[key].gradient,
+                      height: '40px', borderRadius: '10px',
+                    }}/>
+                ))}
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#5C3D1F', marginBottom: '8px', letterSpacing: '0.02em', textTransform: 'uppercase' }}>
+                Icon
+              </label>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '6px' }}>
+                {ICON_OPTIONS.map(name => {
+                  const I = ICON_MAP[name];
+                  const selected = iconName === name;
+                  return (
+                    <div key={name} onClick={() => setIconName(name)}
+                      className={`picker-option ${selected ? 'selected' : ''}`}
+                      style={{
+                        background: selected ? '#3D2817' : '#F5E6D3',
+                        color: selected ? '#fff' : '#5C3D1F',
+                        height: '40px', borderRadius: '10px',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      }}>
+                      <I size={18} strokeWidth={2.2} />
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button onClick={() => setStep('choose')} className="pill-btn" style={{
+                background: '#F5E6D3', color: '#5C3D1F', border: 'none', flex: '0 0 auto',
+                padding: '14px 20px', borderRadius: '14px', fontSize: '14px', fontWeight: 600,
+                cursor: 'pointer', fontFamily: 'inherit',
+              }}>
+                Back
+              </button>
+              <button onClick={handleSaveTask} disabled={!title.trim()} className="pill-btn" style={{
+                background: MED_PALETTE[paletteKey].deep, color: '#fff', border: 'none', flex: 1,
+                padding: '14px', borderRadius: '14px', fontSize: '15px', fontWeight: 700,
+                cursor: 'pointer', fontFamily: 'inherit', opacity: title.trim() ? 1 : 0.5,
+              }}>
+                Add bucket
+              </button>
+            </div>
+          </div>
+        )}
+
+        {step === 'photo' && (
+          <div>
+            <div style={{ marginBottom: '14px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#5C3D1F', marginBottom: '6px', letterSpacing: '0.02em', textTransform: 'uppercase' }}>
+                Image URL
+              </label>
+              <input value={photoUrl} onChange={(e) => setPhotoUrl(e.target.value)}
+                placeholder="https://..."
+                style={{
+                  width: '100%', padding: '12px 14px', border: '1px solid #E8D5BC',
+                  borderRadius: '12px', fontSize: '15px', fontFamily: 'inherit', outline: 'none', color: '#3D2817',
+                  background: '#fff', boxSizing: 'border-box',
+                }}/>
+              <div className="font-editorial" style={{ fontSize: '12px', color: '#9C7A5C', fontStyle: 'italic', marginTop: '6px' }}>
+                paste any direct image link (Pinterest, Unsplash, your GitHub repo)
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', fontSize: '12px', fontWeight: 600, color: '#5C3D1F', marginBottom: '6px', letterSpacing: '0.02em', textTransform: 'uppercase' }}>
+                Caption (optional)
+              </label>
+              <input value={caption} onChange={(e) => setCaption(e.target.value)}
+                placeholder="e.g. golden hour · photo by kiera"
+                style={{
+                  width: '100%', padding: '12px 14px', border: '1px solid #E8D5BC',
+                  borderRadius: '12px', fontSize: '15px', fontFamily: 'inherit', outline: 'none', color: '#3D2817',
+                  background: '#fff', boxSizing: 'border-box',
+                }}/>
+            </div>
+
+            {photoUrl.trim() && (
+              <div style={{
+                background: `linear-gradient(135deg, rgba(0,0,0,0.05), rgba(60, 30, 15, 0.2)), url('${photoUrl}'), #E8D5BC`,
+                backgroundSize: 'cover', backgroundPosition: 'center',
+                height: '160px', borderRadius: '14px', marginBottom: '20px',
+                position: 'relative', overflow: 'hidden',
+              }}>
+                {caption && (
+                  <div className="font-editorial" style={{
+                    position: 'absolute', bottom: '12px', left: '14px', right: '14px',
+                    color: '#fff', fontSize: '13px', fontStyle: 'italic',
+                    textShadow: '0 1px 8px rgba(0,0,0,0.5)',
+                  }}>{caption}</div>
+                )}
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button onClick={() => setStep('choose')} className="pill-btn" style={{
+                background: '#F5E6D3', color: '#5C3D1F', border: 'none', flex: '0 0 auto',
+                padding: '14px 20px', borderRadius: '14px', fontSize: '14px', fontWeight: 600,
+                cursor: 'pointer', fontFamily: 'inherit',
+              }}>
+                Back
+              </button>
+              <button onClick={handleSavePhoto} disabled={!photoUrl.trim()} className="pill-btn" style={{
+                background: '#2E5C5C', color: '#fff', border: 'none', flex: 1,
+                padding: '14px', borderRadius: '14px', fontSize: '15px', fontWeight: 700,
+                cursor: 'pointer', fontFamily: 'inherit', opacity: photoUrl.trim() ? 1 : 0.5,
+              }}>
+                Add bucket
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+// ───────────────────────────────────────────────────────────────────────
+
+function BucketBlock({ bucket, onOpen, delay, gridCol, gridRow }) {
   const Icon = bucket.icon;
   const pct = progressOf(bucket);
   const palette = MED_PALETTE[bucket.paletteKey] || MED_PALETTE.graduation;
 
   return (
-    <button onClick={onOpen} className={`grid-tile fade-up ${wide ? 'flow-wide' : ''}`} style={{
+    <button onClick={onOpen} className="grid-tile fade-up" style={{
+      gridColumn: gridCol, gridRow: gridRow,
       background: palette.gradient, color: '#fff', border: 'none',
-      borderRadius: '24px', padding: '22px', textAlign: 'left',
+      borderRadius: '24px', padding: '20px', textAlign: 'left',
       cursor: 'pointer', display: 'flex', flexDirection: 'column',
       justifyContent: 'space-between', fontFamily: 'inherit',
       animationDelay: `${delay}s`, boxShadow: '0 2px 6px rgba(120, 60, 30, 0.12)',
-      overflow: 'hidden', minHeight: '230px',
+      overflow: 'hidden',
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div style={{
           background: 'rgba(255,255,255,0.25)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)',
-          color: '#fff', width: '42px', height: '42px', borderRadius: '14px',
+          color: '#fff', width: '38px', height: '38px', borderRadius: '12px',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
         }}>
-          {Icon && <Icon size={20} strokeWidth={2.2} />}
+          {Icon && <Icon size={18} strokeWidth={2.2} />}
         </div>
-        <div className="font-display" style={{ fontSize: '36px', fontWeight: 800, lineHeight: 1, textShadow: '0 1px 6px rgba(0,0,0,0.12)' }}>
+        <div className="font-display" style={{ fontSize: '28px', fontWeight: 800, lineHeight: 1, textShadow: '0 1px 6px rgba(0,0,0,0.12)' }}>
           {pct}%
         </div>
       </div>
       <div>
-        <div className="font-display" style={{ fontSize: '32px', fontWeight: 700, lineHeight: 1, marginBottom: '6px', textShadow: '0 1px 8px rgba(0,0,0,0.15)' }}>
+        <div className="font-display" style={{ fontSize: '26px', fontWeight: 700, lineHeight: 1, marginBottom: '4px', textShadow: '0 1px 8px rgba(0,0,0,0.15)' }}>
           {bucket.title}
         </div>
-        <div style={{ fontSize: '13px', opacity: 0.92, fontWeight: 500, marginBottom: '14px' }}>{bucket.note}</div>
-        <div style={{ height: '6px', background: 'rgba(255,255,255,0.3)', borderRadius: '99px', overflow: 'hidden' }}>
+        <div style={{ fontSize: '12px', opacity: 0.92, fontWeight: 500, marginBottom: '10px' }}>{bucket.note}</div>
+        <div style={{ height: '5px', background: 'rgba(255,255,255,0.3)', borderRadius: '99px', overflow: 'hidden' }}>
           <div style={{ width: `${pct}%`, height: '100%', background: '#fff', transition: 'width 0.4s ease' }} />
         </div>
       </div>
@@ -440,19 +716,19 @@ function BucketBlock({ bucket, onOpen, delay, wide }) {
   );
 }
 
-function ImagePanel({ photo, delay, caption, wide }) {
+function ImagePanel({ photo, delay, gridCol, gridRow, caption }) {
   return (
-    <div className={`grid-tile fade-up film ${wide ? 'flow-wide' : ''}`} style={{
+    <div className="grid-tile fade-up film" style={{
+      gridColumn: gridCol, gridRow: gridRow,
       background: `linear-gradient(135deg, rgba(0,0,0,0.05), rgba(60, 30, 15, 0.2)), url('${photo}'), #E8D5BC`,
       backgroundSize: 'cover', backgroundPosition: 'center',
       borderRadius: '24px', animationDelay: `${delay}s`,
       boxShadow: '0 2px 6px rgba(120, 60, 30, 0.12)', position: 'relative', overflow: 'hidden',
-      minHeight: '230px',
     }}>
       {caption && (
         <div className="font-editorial" style={{
-          position: 'absolute', bottom: '16px', left: '20px', right: '20px',
-          color: '#fff', fontSize: '15px', fontStyle: 'italic',
+          position: 'absolute', bottom: '14px', left: '16px', right: '16px',
+          color: '#fff', fontSize: '14px', fontStyle: 'italic',
           textShadow: '0 1px 8px rgba(0,0,0,0.5)', opacity: 0.95,
         }}>
           {caption}
@@ -461,6 +737,27 @@ function ImagePanel({ photo, delay, caption, wide }) {
     </div>
   );
 }
+
+// ─── NEW: Add bucket tile ──────────────────────────────────────────────
+function AddBucketTile({ onClick, delay, gridCol, gridRow }) {
+  return (
+    <button onClick={onClick} className="add-tile fade-up" style={{
+      gridColumn: gridCol, gridRow: gridRow,
+      background: '#FFFBF5', color: '#9C7A5C',
+      border: '2px dashed #E8D5BC', borderRadius: '24px',
+      padding: '20px', display: 'flex', flexDirection: 'column',
+      alignItems: 'center', justifyContent: 'center', gap: '8px',
+      fontFamily: 'inherit', animationDelay: `${delay}s`,
+    }}>
+      <Plus size={32} strokeWidth={2} />
+      <div className="font-display" style={{ fontSize: '18px', fontWeight: 600 }}>add bucket</div>
+      <div className="font-editorial" style={{ fontSize: '12px', fontStyle: 'italic', opacity: 0.7 }}>
+        task or photo
+      </div>
+    </button>
+  );
+}
+// ───────────────────────────────────────────────────────────────────────
 
 function AppTile({ app, delay }) {
   const handleImgError = (e) => {
@@ -471,47 +768,47 @@ function AppTile({ app, delay }) {
   return (
     <a href={app.url} target="_blank" rel="noopener noreferrer" className="app-tile fade-up"
       style={{
-        background: '#FFFFFF', width: '100%', aspectRatio: '1', borderRadius: '18px',
+        background: 'transparent', width: '100%', aspectRatio: '1', borderRadius: '18px',
         display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        color: '#3D2817', textDecoration: 'none', border: '1px solid #F0E1CB',
-        boxShadow: '0 1px 3px rgba(120, 60, 30, 0.06)', animationDelay: `${delay}s`,
-        cursor: 'pointer', position: 'relative', overflow: 'hidden', padding: '8px',
+        color: '#3D2817', textDecoration: 'none',
+        animationDelay: `${delay}s`,
+        cursor: 'pointer', position: 'relative', overflow: 'hidden', padding: '6px',
       }}
       title={`Open ${app.name}`}>
-      <img src={`https://www.google.com/s2/favicons?domain=${app.domain}&sz=128`}
-        alt="" width="42" height="42" loading="lazy" onError={handleImgError}
-        style={{ borderRadius: '8px' }} />
+      <img src={`https://www.google.com/s2/favicons?domain=${app.domain}&sz=64`}
+        alt="" width="28" height="28" loading="lazy" onError={handleImgError}
+        style={{ borderRadius: '6px' }} />
       <span className="fallback-letter font-display" style={{
-        display: 'none', fontSize: '28px', fontWeight: 800, color: app.color, lineHeight: 1,
+        display: 'none', fontSize: '22px', fontWeight: 800, color: app.color, lineHeight: 1,
       }}>{app.name[0]}</span>
       <div style={{
-        fontSize: '11px', fontWeight: 600, opacity: 0.85, marginTop: '7px',
+        fontSize: '9px', fontWeight: 600, opacity: 0.85, marginTop: '5px',
         letterSpacing: '0.02em', lineHeight: 1, textAlign: 'center', color: '#5C3D1F',
       }}>{app.name}</div>
     </a>
   );
 }
 
-function AppLauncherRow({ apps, delay }) {
+function AppLauncherRow({ apps, gridCol, gridRow, delay }) {
   return (
     <div className="fade-up" style={{
-      background: '#FFFFFF', borderRadius: '24px', padding: '20px 24px',
+      gridColumn: gridCol, gridRow: gridRow,
+      background: '#FFFBF5', borderRadius: '24px', padding: '18px 20px',
       animationDelay: `${delay}s`, boxShadow: '0 2px 6px rgba(120, 60, 30, 0.08)',
-      display: 'flex', alignItems: 'center', gap: '20px',
-      border: '1px solid #F0E1CB', marginBottom: '14px',
+      display: 'flex', alignItems: 'center', gap: '16px',
     }}>
       <div style={{ flexShrink: 0 }}>
-        <div className="font-display" style={{ fontSize: '24px', fontWeight: 700, color: '#3D2817', lineHeight: 1 }}>
+        <div className="font-display" style={{ fontSize: '20px', fontWeight: 700, color: '#3D2817', lineHeight: 1 }}>
           Quick launch
         </div>
-        <div className="font-editorial" style={{ fontSize: '13px', color: '#9C7A5C', fontStyle: 'italic', marginTop: '2px' }}>
+        <div className="font-editorial" style={{ fontSize: '12px', color: '#9C7A5C', fontStyle: 'italic', marginTop: '2px' }}>
           all your apps
         </div>
       </div>
       <div style={{
         flex: 1, display: 'grid',
         gridTemplateColumns: `repeat(${apps.length}, 1fr)`,
-        gap: '10px',
+        gap: '8px',
       }}>
         {apps.map((app, i) => (<AppTile key={app.name} app={app} delay={delay + 0.05 + i * 0.03} />))}
       </div>
@@ -523,7 +820,7 @@ function Stat({ label, value }) {
   return (
     <div>
       <div style={{ fontSize: '11px', opacity: 0.75, textTransform: 'uppercase', letterSpacing: '0.12em', fontWeight: 600 }}>{label}</div>
-      <div className="font-display" style={{ fontSize: '34px', fontWeight: 700, lineHeight: 1.1, marginTop: '4px' }}>{value}</div>
+      <div className="font-display" style={{ fontSize: '32px', fontWeight: 700, lineHeight: 1.1, marginTop: '4px' }}>{value}</div>
     </div>
   );
 }
@@ -531,8 +828,8 @@ function Stat({ label, value }) {
 function Hero({ buckets }) {
   const [greeting] = useState(() => GREETINGS[Math.floor(Math.random() * GREETINGS.length)]);
   const [bingLoaded, setBingLoaded] = useState(false);
-  const totalDone = buckets.reduce((s, b) => s + b.tasks.filter(t => t.done).length, 0);
-  const totalTasks = buckets.reduce((s, b) => s + b.tasks.length, 0);
+  const totalDone = buckets.reduce((s, b) => s + (b.tasks ? b.tasks.filter(t => t.done).length : 0), 0);
+  const totalTasks = buckets.reduce((s, b) => s + (b.tasks ? b.tasks.length : 0), 0);
   const gradDays = daysUntil(GRADUATION_DATE);
   const summerDays = daysUntil(SUMMER_END_DATE);
 
@@ -550,8 +847,8 @@ function Hero({ buckets }) {
   return (
     <div className="fade-up film" style={{
       background: bgImage, backgroundSize: 'cover', backgroundPosition: 'center',
-      borderRadius: '28px', padding: '44px 36px', color: '#FFFBF5', marginBottom: '14px',
-      position: 'relative', overflow: 'hidden', minHeight: '300px',
+      borderRadius: '28px', padding: '40px 32px', color: '#FFFBF5', marginBottom: '14px',
+      position: 'relative', overflow: 'hidden', minHeight: '260px',
       display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
       boxShadow: '0 4px 12px rgba(120, 60, 30, 0.15)',
     }}>
@@ -560,14 +857,14 @@ function Hero({ buckets }) {
         <span>Summer 2026 · today's view from somewhere beautiful</span>
       </div>
       <div style={{ marginTop: '20px' }}>
-        <h1 className="font-display hero-headline" style={{ fontSize: '72px', fontWeight: 800, lineHeight: 0.95, margin: 0, textShadow: '0 2px 20px rgba(0,0,0,0.3)' }}>
+        <h1 className="font-display hero-headline" style={{ fontSize: '64px', fontWeight: 800, lineHeight: 0.95, margin: 0, textShadow: '0 2px 20px rgba(0,0,0,0.3)' }}>
           {greeting}
         </h1>
-        <p className="font-editorial" style={{ fontSize: '22px', fontStyle: 'italic', opacity: 0.92, margin: '12px 0 0', maxWidth: '600px' }}>
+        <p className="font-editorial" style={{ fontSize: '20px', fontStyle: 'italic', opacity: 0.92, margin: '10px 0 0', maxWidth: '500px' }}>
           one beautiful, productive, sunlit summer ahead.
         </p>
       </div>
-      <div style={{ display: 'flex', gap: '36px', marginTop: '28px', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: '32px', marginTop: '24px', flexWrap: 'wrap' }}>
         <Stat label="To graduation" value={`${gradDays} days`} />
         <Stat label="Summer left" value={`${summerDays} days`} />
         <Stat label="Tasks done" value={`${totalDone} / ${totalTasks}`} />
@@ -576,29 +873,58 @@ function Hero({ buckets }) {
   );
 }
 
-function Home({ buckets, onOpen }) {
+function Home({ buckets, onOpen, onAddBucket }) {
+  const [showAddPopup, setShowAddPopup] = useState(false);
+
+  // Built-in fixed layout positions for the original 7 buckets + 4 photos.
+  // New custom buckets appear AFTER, in a separate auto-flow row at the bottom.
+  const builtIn = buckets.slice(0, 7);
+  const customs = buckets.slice(7);
+
   return (
     <div className="font-body" style={{ background: '#FFFFFF', minHeight: '100vh', padding: '20px' }}>
       <style>{STYLES}</style>
+      {showAddPopup && <AddBucketPopup onClose={() => setShowAddPopup(false)} onSave={onAddBucket} />}
       <div style={{ maxWidth: '1600px', margin: '0 auto' }}>
         <Hero buckets={buckets} />
-        <AppLauncherRow apps={APPS} delay={0.15} />
 
-        {/* Natural-flow bento grid. "wide" prop makes a card span 2 columns when there's room.
-            Order chosen for visual rhythm: bucket, image, bucket, bucket, image, bucket, image,
-            with some wide cards mixed in. */}
-        <div className="flow-grid">
-          <BucketBlock bucket={buckets[0]} onOpen={() => onOpen(buckets[0].id)} delay={0.25} wide />
-          <ImagePanel photo={MY_PHOTOS.slot1} delay={0.3} caption="pacific nw skies · photo by kiera antonelli" />
-          <BucketBlock bucket={buckets[1]} onOpen={() => onOpen(buckets[1].id)} delay={0.35} />
-          <BucketBlock bucket={buckets[2]} onOpen={() => onOpen(buckets[2].id)} delay={0.4} />
-          <ImagePanel photo={MY_PHOTOS.slot2} delay={0.45} caption="snoqualmie falls · photo by kiera antonelli" wide />
-          <BucketBlock bucket={buckets[3]} onOpen={() => onOpen(buckets[3].id)} delay={0.5} />
-          <ImagePanel photo={MY_PHOTOS.slot3} delay={0.55} caption="bloom season · photo by kiera antonelli" />
-          <BucketBlock bucket={buckets[4]} onOpen={() => onOpen(buckets[4].id)} delay={0.6} />
-          <BucketBlock bucket={buckets[5]} onOpen={() => onOpen(buckets[5].id)} delay={0.65} />
-          <ImagePanel photo={MY_PHOTOS.slot4} delay={0.7} caption="the olympics · photo by kiera antonelli" wide />
-          <BucketBlock bucket={buckets[6]} onOpen={() => onOpen(buckets[6].id)} delay={0.75} />
+        <div className="bento-grid" style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(6, 1fr)',
+          gridAutoRows: '110px',
+          gap: '12px',
+        }}>
+          {builtIn[0] && <BucketBlock bucket={builtIn[0]} onOpen={() => onOpen(builtIn[0].id)} delay={0.1} gridCol="span 3" gridRow="span 2" />}
+          <ImagePanel photo={MY_PHOTOS.slot1} delay={0.15} gridCol="span 3" gridRow="span 2" caption="pacific nw skies · photo by kiera antonelli" />
+
+          <ImagePanel photo={MY_PHOTOS.slot2} delay={0.2} gridCol="span 2" gridRow="span 2" caption="snoqualmie falls · photo by kiera antonelli" />
+          {builtIn[1] && <BucketBlock bucket={builtIn[1]} onOpen={() => onOpen(builtIn[1].id)} delay={0.25} gridCol="span 2" gridRow="span 2" />}
+          {builtIn[2] && <BucketBlock bucket={builtIn[2]} onOpen={() => onOpen(builtIn[2].id)} delay={0.3} gridCol="span 2" gridRow="span 2" />}
+
+          <AppLauncherRow apps={APPS} gridCol="span 6" gridRow="span 1" delay={0.35} />
+
+          {builtIn[3] && <BucketBlock bucket={builtIn[3]} onOpen={() => onOpen(builtIn[3].id)} delay={0.4} gridCol="span 2" gridRow="span 2" />}
+          <ImagePanel photo={MY_PHOTOS.slot3} delay={0.45} gridCol="span 2" gridRow="span 2" caption="bloom season · photo by kiera antonelli" />
+          {builtIn[4] && <BucketBlock bucket={builtIn[4]} onOpen={() => onOpen(builtIn[4].id)} delay={0.5} gridCol="span 2" gridRow="span 2" />}
+
+          {builtIn[5] && <BucketBlock bucket={builtIn[5]} onOpen={() => onOpen(builtIn[5].id)} delay={0.55} gridCol="span 2" gridRow="span 2" />}
+          <ImagePanel photo={MY_PHOTOS.slot4} delay={0.6} gridCol="span 2" gridRow="span 2" caption="the olympics · photo by kiera antonelli" />
+          {builtIn[6] && <BucketBlock bucket={builtIn[6]} onOpen={() => onOpen(builtIn[6].id)} delay={0.65} gridCol="span 2" gridRow="span 2" />}
+
+          {/* Custom buckets the user added (task or photo, in order they added them) */}
+          {customs.map((b, i) => (
+            b.kind === 'photo' ? (
+              <ImagePanel key={b.id} photo={b.photoUrl} delay={0.7 + i * 0.05}
+                gridCol="span 2" gridRow="span 2" caption={b.caption} />
+            ) : (
+              <BucketBlock key={b.id} bucket={b} onOpen={() => onOpen(b.id)}
+                delay={0.7 + i * 0.05} gridCol="span 2" gridRow="span 2" />
+            )
+          ))}
+
+          {/* The + add button always lives at the end */}
+          <AddBucketTile onClick={() => setShowAddPopup(true)}
+            delay={0.7 + customs.length * 0.05} gridCol="span 2" gridRow="span 2" />
         </div>
 
         <div className="font-editorial fade-up" style={{ textAlign: 'center', marginTop: '36px', marginBottom: '24px', fontSize: '18px', fontStyle: 'italic', color: '#9C7A5C', animationDelay: '0.9s' }}>
@@ -648,7 +974,7 @@ function BucketView({ bucket, onBack, onToggle, onMove, onAdd, onDelete }) {
       )}
       <div style={{ maxWidth: '1600px', margin: '0 auto' }}>
         <button onClick={onBack} className="pill-btn fade-up" style={{
-          background: '#FAEFE0', border: 'none', color: palette.deep,
+          background: 'rgba(255,251,245,0.7)', border: 'none', color: palette.deep,
           display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 600,
           cursor: 'pointer', padding: '8px 14px', borderRadius: '99px', marginBottom: '14px', fontFamily: 'inherit',
         }}>
@@ -682,7 +1008,7 @@ function BucketView({ bucket, onBack, onToggle, onMove, onAdd, onDelete }) {
             placeholder="add a new task..."
             style={{
               flex: 1, padding: '14px 20px', borderRadius: '16px', border: '1px solid #F0E1CB',
-              background: '#FFFFFF', fontSize: '15px', fontFamily: 'inherit', outline: 'none',
+              background: '#FFFBF5', fontSize: '15px', fontFamily: 'inherit', outline: 'none',
               boxShadow: '0 1px 3px rgba(120, 60, 30, 0.06)', color: '#3D2817',
             }}/>
           <button onClick={handleAdd} className="pill-btn" style={{
@@ -699,7 +1025,7 @@ function BucketView({ bucket, onBack, onToggle, onMove, onAdd, onDelete }) {
             const items = bucket.tasks.filter(t => t.col === col.id);
             return (
               <div key={col.id} className="fade-up" style={{
-                background: '#FFFFFF', borderRadius: '20px', padding: '20px',
+                background: '#FFFBF5', borderRadius: '20px', padding: '20px',
                 minHeight: '320px', animationDelay: `${0.15 + ci * 0.06}s`,
                 border: '1px solid #F0E1CB',
                 boxShadow: '0 1px 3px rgba(120, 60, 30, 0.04)',
@@ -802,8 +1128,16 @@ export default function App() {
       tasks: b.tasks.filter(t => t.id !== taskId),
     }));
   };
+  const addBucket = (newBucket) => {
+    const withIcon = newBucket.kind === 'task'
+      ? { ...newBucket, icon: ICON_MAP[newBucket.iconName] || ICON_MAP.Star }
+      : newBucket;
+    setBuckets(prev => [...prev, withIcon]);
+  };
 
-  if (view === 'home') return <Home buckets={buckets} onOpen={setView} />;
+  if (view === 'home') return <Home buckets={buckets} onOpen={setView} onAddBucket={addBucket} />;
   const bucket = buckets.find(b => b.id === view);
+  // Photo buckets aren't openable (no kanban view), so fall back to home
+  if (!bucket || bucket.kind === 'photo') return <Home buckets={buckets} onOpen={setView} onAddBucket={addBucket} />;
   return <BucketView bucket={bucket} onBack={() => setView('home')} onToggle={toggle} onMove={move} onAdd={add} onDelete={deleteTask} />;
 }
