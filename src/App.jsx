@@ -23,14 +23,14 @@ const APPS = [
 ];
 
 const GREETINGS = [
-  "attitude reflects leadership, captain.",
+  "Attitude reflects leadership, captain.",
   "amaze, amaze, amaze.",
-  "with great ability comes great accountability.",
-  "you're never wrong to do the right thing.",
-  "sometimes, a winner is a dreamer who just won't quit.",
-  "don't let anyone ever make you feel like you don't deserve what you want.",
-  "yeah, maybe, but at least I won't be unoriginal.",
-  "sometimes one dream is enough to light up the whole sky.",
+  "With great ability comes great accountability.",
+  "You're never wrong to do the right thing.",
+  "Sometimes, a winner is a dreamer who just won't quit.",
+  "Don't let anyone ever make you feel like you don't deserve what you want.",
+  "Yeah, maybe, but at least I won't be unoriginal.",
+  "Sometimes one dream is enough to light up the whole sky.",
 ];
 
 const MY_PHOTOS = {
@@ -963,7 +963,6 @@ function Home({ buckets, onOpen, onAddBucket }) {
         
       <AppLauncherRowStandalone apps={APPS} delay={0.05} />
 
-        <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
        <div className="bento-grid" style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(6, 1fr)',
@@ -1001,13 +1000,12 @@ function Home({ buckets, onOpen, onAddBucket }) {
           })}
 
           {/* The + add button always lives at the end */}
-       <AddBucketTile onClick={() => setShowAddPopup(true)}
+      <AddBucketTile onClick={() => setShowAddPopup(true)}
             delay={0.7 + customs.length * 0.05} gridCol="span 2" gridRow="span 2" />
-        </div>
         </div>
 
         <div className="font-editorial fade-up" style={{ textAlign: 'center', marginTop: '36px', marginBottom: '24px', fontSize: '18px', fontStyle: 'italic', color: '#9C7A5C', animationDelay: '0.9s' }}>
-          designed by Kiera Antonelli · built with Claude
+          Designed by Kiera Antonelli · Built with Claude
         </div>
       </div>
     </div>
