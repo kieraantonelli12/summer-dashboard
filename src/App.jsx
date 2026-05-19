@@ -48,7 +48,7 @@ const MED_PALETTE = {
   room:       { gradient: 'linear-gradient(135deg, #8B6F47 0%, #B89B6A 100%)', deep: '#4A3A20', soft: '#E8DCC4' },
   classes:    { gradient: 'linear-gradient(135deg, #F2B544 0%, #FFD683 100%)', deep: '#7A4F0A', soft: '#FCE9C4' },
   career:     { gradient: 'linear-gradient(135deg, #5C8B8B 0%, #8FB5B5 100%)', deep: '#274545', soft: '#D9EAEA' },
-  income:     { gradient: 'linear-gradient(135deg, #A6925A 0%, #C9B47E 100%)', deep: '#4A3D1F', soft: '#E8DDC0' },
+  incomeincome:     { gradient: 'linear-gradient(135deg, #2E5C5C 0%, #E85C3F 100%)', deep: '#1A3838', soft: '#FAD7CB' },
   activities: { gradient: 'linear-gradient(135deg, #C84C2E 0%, #E85C3F 100%)', deep: '#7A1E08', soft: '#FAD7CB' },
 };
 // ───────────────────────────────────────────────────────────────────────
@@ -580,11 +580,10 @@ function Hero({ buckets }) {
 function Home({ buckets, onOpen }) {
   return (
     <div className="font-body" style={{
-      background: 'linear-gradient(180deg, #FCEFE3 0%, #F5DCC4 100%)',
-      minHeight: '100vh', padding: '20px',
+background: '#FFFFFF',      minHeight: '100vh', padding: '20px',
     }}>
       <style>{STYLES}</style>
-      <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+     <div style={{ maxWidth: '1600px', margin: '0 auto' }}>
         <Hero buckets={buckets} />
 
         <div className="bento-grid" style={{
@@ -612,7 +611,7 @@ function Home({ buckets, onOpen }) {
         </div>
 
         <div className="font-editorial fade-up" style={{ textAlign: 'center', marginTop: '36px', marginBottom: '24px', fontSize: '18px', fontStyle: 'italic', color: '#9C7A5C', animationDelay: '0.9s' }}>
-          click any bucket to open its kanban
+          designed by Kiera Antonelli · built with Claude
         </div>
       </div>
     </div>
@@ -642,7 +641,7 @@ function BucketView({ bucket, onBack, onToggle, onMove, onAdd, onDelete }) {
 
   return (
     <div className="font-body" style={{
-      background: 'linear-gradient(180deg, #FCEFE3 0%, #F5DCC4 100%)',
+      background: '#FFFFFF',
       minHeight: '100vh', padding: '20px',
     }}>
       <style>{STYLES}</style>
@@ -659,7 +658,7 @@ function BucketView({ bucket, onBack, onToggle, onMove, onAdd, onDelete }) {
           onCancel={() => setDeleteTaskId(null)}
         />
       )}
-      <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
+      <div style={{ maxWidth: '1600px', margin: '0 auto' }}>
         <button onClick={onBack} className="pill-btn fade-up" style={{
           background: 'rgba(255,251,245,0.7)', border: 'none', color: palette.deep,
           display: 'flex', alignItems: 'center', gap: '6px', fontSize: '13px', fontWeight: 600,
