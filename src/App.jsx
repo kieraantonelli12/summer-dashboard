@@ -22,14 +22,14 @@ const APPS = [
 ];
 
 const GREETINGS = [
-  "Attitude reflects leadership, captain. -Julius Campbell",
-  "Amaze, amaze, amaze. -Rocky",
-  "With great ability comes great accountability. -Miles Morales",
-  "You're never wrong to do the right thing. -Ben Whittaker ",
-  "Sometimes, a winner is a dreamer who just won't quit. -Rudy Ruettiger",
-  "Don't let anyone ever make you feel like you don't deserve what you want. -Patrick Verona",
-  "Yeah, maybe, but at least I won't be unoriginal. -Will Hunting",
-  "Sometimes one dream is enough to light up the whole sky. -Homer Hickam",
+  "Attitude reflects leadership, captain.",
+  "Amaze, amaze, amaze.",
+  "With great ability comes great accountability.",
+  "You're never wrong to do the right thing.",
+  "Sometimes, a winner is a dreamer who just won't quit.",
+  "Don't let anyone ever make you feel like you don't deserve what you want",
+  "Yeah, maybe, but at least I won't be unoriginal.",
+  "Sometimes one dream is enough to light up the whole sky.",
 ];
 
 const MY_PHOTOS = {
